@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
 import '../../../models/waste_model.dart';
-import '../../../viewmodels/admin_viewmodel.dart';
+import '../../../cubits/admin/admin_cubit.dart';
+import '../../../cubits/admin/admin_state.dart';
 import '../../widgets/custom_button.dart';
 
 class AdminPickupScreen extends StatelessWidget {
@@ -11,27 +12,28 @@ class AdminPickupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<AdminViewModel>(
-        builder: (context, adminVm, _) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildHeader(context, adminVm),
-                Padding(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            BlocBuilder<AdminCubit, AdminState>(
+              builder: (context, state) {
+                final pickups = state is AdminLoaded ? state.pickups : <WastePickup>[];
+                return Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
-                    children: _buildPickupList(context, adminVm),
+                    children: _buildPickupList(context, pickups),
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, AdminViewModel adminVm) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -91,24 +93,22 @@ class AdminPickupScreen extends StatelessWidget {
                   children: [
                     _FilterChip(
                       label: 'Semua',
-                      active: adminVm.selectedFilter == null,
-                      onTap: () => adminVm.setFilter(null),
+                      active: true,
+                      onTap: () => context.read<AdminCubit>().setFilter(null),
                     ),
                     SizedBox(width: 8),
                     _FilterChip(
                       label: 'Menunggu',
-                      active: adminVm.selectedFilter ==
-                          PickupStatus.waiting,
+                      active: false,
                       onTap: () =>
-                          adminVm.setFilter(PickupStatus.waiting),
+                          context.read<AdminCubit>().setFilter(PickupStatus.waiting),
                     ),
                     SizedBox(width: 8),
                     _FilterChip(
                       label: 'Dikonfirmasi',
-                      active: adminVm.selectedFilter ==
-                          PickupStatus.confirmed,
+                      active: false,
                       onTap: () =>
-                          adminVm.setFilter(PickupStatus.confirmed),
+                          context.read<AdminCubit>().setFilter(PickupStatus.confirmed),
                     ),
                   ],
                 ),
@@ -122,22 +122,21 @@ class AdminPickupScreen extends StatelessWidget {
 
   List<Widget> _buildPickupList(
     BuildContext context,
-    AdminViewModel adminVm,
+    List<WastePickup> pickups,
   ) {
     List<Widget> items = [];
-    for (int i = 0; i < adminVm.pickups.length; i++) {
-      final pickup = adminVm.pickups[i];
+    for (int i = 0; i < pickups.length; i++) {
+      final pickup = pickups[i];
       items.add(
         _PickupItem(
           pickup: pickup,
           onTap: () => _showPickupDetail(
             context,
-            adminVm,
             pickup,
           ),
         ),
       );
-      if (i < adminVm.pickups.length - 1) {
+      if (i < pickups.length - 1) {
         items.add(SizedBox(height: 10));
       }
     }
@@ -146,7 +145,6 @@ class AdminPickupScreen extends StatelessWidget {
 
   void _showPickupDetail(
     BuildContext context,
-    AdminViewModel adminVm,
     WastePickup pickup,
   ) {
     showModalBottomSheet(
@@ -160,7 +158,6 @@ class AdminPickupScreen extends StatelessWidget {
       ),
       builder: (context) => _PickupDetailSheet(
         pickup: pickup,
-        adminVm: adminVm,
       ),
     );
   }
@@ -333,11 +330,9 @@ class _PickupItem extends StatelessWidget {
 
 class _PickupDetailSheet extends StatelessWidget {
   final WastePickup pickup;
-  final AdminViewModel adminVm;
 
   const _PickupDetailSheet({
     required this.pickup,
-    required this.adminVm,
   });
 
   @override
@@ -465,11 +460,9 @@ class _PickupDetailSheet extends StatelessWidget {
                   label: 'Tolak',
                   borderColor: Color(0xFFffcdd2),
                   textColor: AppColors.error,
-                  onPressed: () async {
-                    await adminVm.rejectPickup(pickup.id);
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
+                  onPressed: () {
+                    context.read<AdminCubit>().rejectPickup(pickup.id);
+                    Navigator.pop(context);
                   },
                 ),
               ),
@@ -478,11 +471,9 @@ class _PickupDetailSheet extends StatelessWidget {
                 flex: 2,
                 child: PrimaryButton(
                   label: 'Konfirmasi',
-                  onPressed: () async {
-                    await adminVm.confirmPickup(pickup.id);
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
+                  onPressed: () {
+                    context.read<AdminCubit>().confirmPickup(pickup.id);
+                    Navigator.pop(context);
                   },
                 ),
               ),

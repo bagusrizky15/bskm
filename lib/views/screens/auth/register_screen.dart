@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../viewmodels/auth_viewmodel.dart';
+import '../../../cubits/auth/auth_cubit.dart';
+import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
@@ -261,21 +262,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: 18),
 
               // Register button
-              Consumer<AuthViewModel>(
-                builder: (context, authVm, _) {
+              BlocConsumer<AuthCubit, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthSuccess) {
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  } else if (state is AuthFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Pendaftaran gagal: ${state.message}')),
+                    );
+                  }
+                },
+                builder: (context, state) {
                   return PrimaryButton(
                     label: 'Daftar Sekarang',
-                    isLoading: authVm.isLoading,
-                    onPressed: () async {
-                      await authVm.register(
+                    isLoading: state is AuthLoading,
+                    onPressed: () {
+                      context.read<AuthCubit>().register(
                         _nameController.text,
                         _emailController.text,
                         _phoneController.text,
                         _passwordController.text,
                       );
-                      if (mounted) {
-                        Navigator.of(context).pushReplacementNamed('/home');
-                      }
                     },
                   );
                 },

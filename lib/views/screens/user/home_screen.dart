@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../viewmodels/auth_viewmodel.dart';
+import '../../../cubits/auth/auth_cubit.dart';
+import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/app_icons.dart';
 
@@ -10,16 +11,19 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
-      builder: (context, authVm, _) {
-        if (authVm.currentUser?.isAdmin == true) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacementNamed('/admin-home');
-          });
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSuccess && state.user.isAdmin) {
+          Navigator.of(context).pushReplacementNamed('/admin-home');
         }
+      },
+      child: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, authState) {
+          if (authState is AuthSuccess && authState.user.isAdmin) {
+            return Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
         return Scaffold(
           body: SingleChildScrollView(
@@ -222,18 +226,19 @@ class HomeScreen extends StatelessWidget {
                         Navigator.pushNamed(context, '/balance'),
                   ),
                   SizedBox(height: 16),
-                  Consumer<AuthViewModel>(
-                    builder: (context, authVm, _) {
+                  BlocConsumer<AuthCubit, AuthState>(
+                    listener: (context, logoutState) {
+                      if (logoutState is AuthLoggedOut) {
+                        Navigator.of(context).pushReplacementNamed('/login');
+                      }
+                    },
+                    builder: (context, logoutState) {
                       return SecondaryButton(
                         label: 'Keluar',
                         borderColor: Color(0xFFffcdd2),
                         textColor: AppColors.error,
-                        onPressed: () async {
-                          await authVm.logout();
-                          if (context.mounted) {
-                            Navigator.of(context)
-                                .pushReplacementNamed('/login');
-                          }
+                        onPressed: () {
+                          context.read<AuthCubit>().logout();
                         },
                       );
                     },
@@ -245,7 +250,8 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 }

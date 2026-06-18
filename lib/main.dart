@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme.dart';
-import 'viewmodels/auth_viewmodel.dart';
-import 'viewmodels/home_viewmodel.dart';
-import 'viewmodels/pickup_viewmodel.dart';
-import 'viewmodels/admin_viewmodel.dart';
+import 'cubits/auth/auth_cubit.dart';
+import 'cubits/home/home_cubit.dart';
+import 'cubits/pickup/pickup_cubit.dart';
+import 'cubits/admin/admin_cubit.dart';
 import 'views/screens/auth/splash_screen.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/auth/register_screen.dart';
@@ -22,16 +22,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => HomeViewModel()),
-        ChangeNotifierProvider(create: (_) => PickupViewModel()),
-        ChangeNotifierProvider(create: (_) => AdminViewModel()),
+        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider(create: (_) => HomeCubit()),
+        BlocProvider(create: (_) => PickupCubit()),
+        BlocProvider(create: (_) => AdminCubit()),
       ],
       child: MaterialApp(
         title: 'Bank Sampah',

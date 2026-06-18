@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../viewmodels/home_viewmodel.dart';
+import '../../../cubits/home/home_cubit.dart';
+import '../../../cubits/home/home_state.dart';
 import '../../widgets/custom_button.dart';
 
 class BalanceScreen extends StatelessWidget {
@@ -10,23 +11,25 @@ class BalanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<HomeViewModel>(
-        builder: (context, homeVm, _) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildHeader(context, homeVm),
-                _buildTransactionList(homeVm),
-              ],
-            ),
-          );
+      body: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoaded) {
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildHeader(context, state.balance),
+                  _buildTransactionList(state.balance),
+                ],
+              ),
+            );
+          }
+          return Center(child: CircularProgressIndicator());
         },
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, HomeViewModel homeVm) {
-    final balance = homeVm.balance;
+  Widget _buildHeader(BuildContext context, dynamic balance) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -173,7 +176,7 @@ class BalanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionList(HomeViewModel homeVm) {
+  Widget _buildTransactionList(dynamic balance) {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -188,7 +191,7 @@ class BalanceScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12),
-          ...homeVm.balance.transactions
+          ...balance.transactions
               .map((tx) => _TransactionItem(transaction: tx))
               .toList()
               .expand((w) => [w, SizedBox(height: 9)])

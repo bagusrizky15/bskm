@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../viewmodels/auth_viewmodel.dart';
+import '../../../cubits/auth/auth_cubit.dart';
+import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -39,26 +40,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withAlpha(77),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(Icons.recycling, color: Colors.white, size: 22),
-              ),
-              SizedBox(height: 10),
               Text(
                 'Bank Sampah',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1B5E20),
+                  letterSpacing: -0.2,
+                ),
+              ),
+              Text(
+                'Karya Mandiri',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -128,19 +120,25 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 28),
 
               // Login button
-              Consumer<AuthViewModel>(
-                builder: (context, authVm, _) {
+              BlocConsumer<AuthCubit, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthSuccess) {
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  } else if (state is AuthFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Login gagal: ${state.message}')),
+                    );
+                  }
+                },
+                builder: (context, state) {
                   return PrimaryButton(
                     label: 'Masuk',
-                    isLoading: authVm.isLoading,
-                    onPressed: () async {
-                      await authVm.login(
+                    isLoading: state is AuthLoading,
+                    onPressed: () {
+                      context.read<AuthCubit>().login(
                         _emailController.text,
                         _passwordController.text,
                       );
-                      if (mounted) {
-                        Navigator.of(context).pushReplacementNamed('/home');
-                      }
                     },
                   );
                 },

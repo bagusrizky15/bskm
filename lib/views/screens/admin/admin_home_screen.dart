@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../viewmodels/admin_viewmodel.dart';
-import '../../../viewmodels/auth_viewmodel.dart';
+import '../../../cubits/admin/admin_cubit.dart';
+import '../../../cubits/admin/admin_state.dart';
+import '../../../cubits/auth/auth_cubit.dart';
+import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
 
 class AdminHomeScreen extends StatelessWidget {
@@ -11,12 +13,15 @@ class AdminHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<AdminViewModel>(
-        builder: (context, adminVm, _) {
+      body: BlocBuilder<AdminCubit, AdminState>(
+        builder: (context, state) {
+          final totalUsers = state is AdminLoaded ? state.totalUsers : 138;
+          final totalWaste = state is AdminLoaded ? state.totalWaste : 52;
+
           return SingleChildScrollView(
             child: Column(
               children: [
-                _buildHeader(context, adminVm),
+                _buildHeader(context, totalUsers, totalWaste),
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -55,18 +60,20 @@ class AdminHomeScreen extends StatelessWidget {
                             Navigator.pushNamed(context, '/admin-balance'),
                       ),
                       SizedBox(height: 16),
-                      Consumer<AuthViewModel>(
-                        builder: (context, authVm, _) {
+                      BlocConsumer<AuthCubit, AuthState>(
+                        listener: (context, authState) {
+                          if (authState is AuthLoggedOut) {
+                            Navigator.of(context)
+                                .pushReplacementNamed('/login');
+                          }
+                        },
+                        builder: (context, authState) {
                           return SecondaryButton(
                             label: 'Keluar',
                             borderColor: Color(0xFFffcdd2),
                             textColor: AppColors.error,
-                            onPressed: () async {
-                              await authVm.logout();
-                              if (context.mounted) {
-                                Navigator.of(context)
-                                    .pushReplacementNamed('/login');
-                              }
+                            onPressed: () {
+                              context.read<AuthCubit>().logout();
                             },
                           );
                         },
@@ -82,7 +89,7 @@ class AdminHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, AdminViewModel adminVm) {
+  Widget _buildHeader(BuildContext context, int totalUsers, int totalWaste) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -177,14 +184,14 @@ class AdminHomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _StatCard(
-                      value: '${adminVm.totalUsers}',
+                      value: '$totalUsers',
                       label: 'Total Pengguna',
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: _StatCard(
-                      value: '${adminVm.totalWaste} kg',
+                      value: '$totalWaste kg',
                       label: 'Sampah Terkumpul',
                     ),
                   ),

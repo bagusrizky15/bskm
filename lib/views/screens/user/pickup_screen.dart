@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
 import '../../../models/waste_model.dart';
-import '../../../viewmodels/pickup_viewmodel.dart';
+import '../../../cubits/pickup/pickup_cubit.dart';
+import '../../../cubits/pickup/pickup_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
@@ -104,8 +105,34 @@ class _PickupScreenState extends State<PickupScreen> {
             // Form
             Padding(
               padding: EdgeInsets.all(20),
-              child: Consumer<PickupViewModel>(
-                builder: (context, pickupVm, _) {
+              child: BlocConsumer<PickupCubit, PickupState>(
+                listener: (context, state) {
+                  if (state is PickupSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Penjemputan berhasil diajukan')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state is PickupFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${state.message}')),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  final isSubmitting = state is PickupSubmitting;
+                  final selectedCategory = state is PickupFormChanged
+                      ? state.selectedCategory
+                      : 'Plastik';
+                  final weight = state is PickupFormChanged
+                      ? state.weight
+                      : 2.5;
+                  final estimatedPrice = state is PickupFormChanged
+                      ? state.estimatedPrice
+                      : 6250;
+                  final selectedDate = state is PickupFormChanged
+                      ? state.selectedDate
+                      : DateTime(2026, 6, 20);
+
                   return Column(
                     children: [
                       CustomTextField(
@@ -116,7 +143,7 @@ class _PickupScreenState extends State<PickupScreen> {
                       SizedBox(height: 13),
                       CustomDropdown<String>(
                         label: 'Kategori Sampah',
-                        value: pickupVm.selectedCategory,
+                        value: selectedCategory,
                         items: WasteCategory.values
                             .map((cat) => DropdownMenuItem(
                               value: cat.name,
@@ -125,7 +152,7 @@ class _PickupScreenState extends State<PickupScreen> {
                             .toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            pickupVm.setCategory(value);
+                            context.read<PickupCubit>().setCategory(value);
                           }
                         },
                       ),
@@ -165,7 +192,7 @@ class _PickupScreenState extends State<PickupScreen> {
                                         padding:
                                             EdgeInsets.only(left: 14),
                                         child: Text(
-                                          pickupVm.weight.toString(),
+                                          weight.toString(),
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight:
@@ -229,7 +256,7 @@ class _PickupScreenState extends State<PickupScreen> {
                                         padding:
                                             EdgeInsets.only(left: 14),
                                         child: Text(
-                                          'Rp ${pickupVm.estimatedPrice}',
+                                          'Rp $estimatedPrice',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight:
@@ -284,14 +311,13 @@ class _PickupScreenState extends State<PickupScreen> {
                             onTap: () async {
                               final date = await showDatePicker(
                                 context: context,
-                                initialDate:
-                                    pickupVm.selectedDate,
+                                initialDate: selectedDate,
                                 firstDate: DateTime.now(),
                                 lastDate: DateTime.now()
                                     .add(Duration(days: 30)),
                               );
-                              if (date != null) {
-                                pickupVm.setDate(date);
+                              if (date != null && context.mounted) {
+                                context.read<PickupCubit>().setDate(date);
                               }
                             },
                             child: Container(
@@ -314,7 +340,7 @@ class _PickupScreenState extends State<PickupScreen> {
                                           .spaceBetween,
                                   children: [
                                     Text(
-                                      '${pickupVm.selectedDate.day} ${_getMonthName(pickupVm.selectedDate.month)} ${pickupVm.selectedDate.year}',
+                                      '${selectedDate.day} ${_getMonthName(selectedDate.month)} ${selectedDate.year}',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color:
@@ -427,23 +453,13 @@ class _PickupScreenState extends State<PickupScreen> {
                       PrimaryButton(
                         label: 'Ajukan Penjemputan',
                         icon: Icons.check,
-                        isLoading: pickupVm.isLoading,
-                        onPressed: () async {
-                          await pickupVm.submitPickup(
+                        isLoading: isSubmitting,
+                        onPressed: () {
+                          context.read<PickupCubit>().submitPickup(
                             _nameController.text,
                             _addressController.text,
                             _notesController.text,
                           );
-                          if (mounted) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Penjemputan berhasil diajukan'),
-                              ),
-                            );
-                            Navigator.pop(context);
-                          }
                         },
                       ),
                     ],
