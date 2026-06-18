@@ -5,8 +5,8 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthInitial());
 
-  User? _currentUser;
-  User? get currentUser => _currentUser;
+  UserModel? _currentUser;
+  UserModel? get currentUser => _currentUser;
 
   bool get isLoggedIn => _currentUser != null;
   bool get isAdmin => _currentUser?.isAdmin ?? false;
@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
     await Future.delayed(const Duration(seconds: 1));
 
     try {
-      _currentUser = User(
+      _currentUser = UserModel(
         id: '1',
         name: 'Budi Santoso',
         email: email,
@@ -39,7 +39,7 @@ class AuthCubit extends Cubit<AuthState> {
     await Future.delayed(const Duration(seconds: 1));
 
     try {
-      _currentUser = User(
+      _currentUser = UserModel(
         id: '${DateTime.now().millisecondsSinceEpoch}',
         name: fullName,
         email: email,
@@ -57,7 +57,7 @@ class AuthCubit extends Cubit<AuthState> {
     await Future.delayed(const Duration(seconds: 1));
 
     try {
-      _currentUser = User(
+      _currentUser = UserModel(
         id: 'admin-1',
         name: 'Admin Pusat',
         email: email,

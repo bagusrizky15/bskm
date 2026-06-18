@@ -188,23 +188,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Register link
               Center(
-                child: RichText(
-                  text: TextSpan(
-                    text: 'Belum punya akun? ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textGray,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: 'Daftar',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/register');
+                  },
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Belum punya akun? ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textGray,
                       ),
-                    ],
+                      children: [
+                        TextSpan(
+                          text: 'Daftar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
