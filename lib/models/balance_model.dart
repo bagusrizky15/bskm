@@ -6,6 +6,15 @@ enum TransactionType {
   const TransactionType(this.label);
 }
 
+enum WithdrawalStatus {
+  pending('Menunggu'),
+  approved('Disetujui'),
+  rejected('Ditolak');
+
+  final String label;
+  const WithdrawalStatus(this.label);
+}
+
 class BalanceTransaction {
   final String id;
   final TransactionType type;
@@ -40,4 +49,59 @@ class Balance {
     required this.withdrawn,
     required this.transactions,
   });
+}
+
+class UserBalance {
+  final int id;
+  final String userId;
+  final int total;
+  final int withdrawn;
+  final int balance;
+
+  UserBalance({
+    required this.id,
+    required this.userId,
+    required this.total,
+    required this.withdrawn,
+    required this.balance,
+  });
+
+  factory UserBalance.fromJson(Map<String, dynamic> json) {
+    return UserBalance(
+      id: json['id'],
+      userId: json['user_id'],
+      total: json['total'] ?? 0,
+      withdrawn: json['withdrawn'] ?? 0,
+      balance: json['balance'] ?? 0,
+    );
+  }
+}
+
+class Withdrawal {
+  final int id;
+  final String userId;
+  final int amount;
+  final WithdrawalStatus status;
+  final DateTime createdAt;
+
+  Withdrawal({
+    required this.id,
+    required this.userId,
+    required this.amount,
+    required this.status,
+    required this.createdAt,
+  });
+
+  factory Withdrawal.fromJson(Map<String, dynamic> json) {
+    return Withdrawal(
+      id: json['id'],
+      userId: json['user_id'],
+      amount: json['amount'],
+      status: WithdrawalStatus.values.firstWhere(
+        (s) => s.name == json['status'],
+        orElse: () => WithdrawalStatus.pending,
+      ),
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
 }
