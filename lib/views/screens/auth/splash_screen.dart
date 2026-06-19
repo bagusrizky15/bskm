@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
+import '../../../cubits/auth/auth_cubit.dart';
+import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/app_icons.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,23 +13,37 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _sessionChecked = false;
+
   @override
   void initState() {
     super.initState();
-    _navigateToLogin();
+    _checkSession();
   }
 
-  void _navigateToLogin() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
-    });
+  Future<void> _checkSession() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() => _sessionChecked = true);
+    await context.read<AuthCubit>().checkSession();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (_, current) => _sessionChecked,
+      listener: (context, state) {
+        if (state is AuthSuccess) {
+          if (state.user.isAdmin) {
+            Navigator.of(context).pushReplacementNamed('/admin-home');
+          } else {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
+        } else if (state is AuthInitial) {
+          Navigator.of(context).pushReplacementNamed('/login');
+        }
+      },
+      child: Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -83,6 +100,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -15,6 +15,8 @@ class HomeScreen extends StatelessWidget {
       listener: (context, state) {
         if (state is AuthSuccess && state.user.isAdmin) {
           Navigator.of(context).pushReplacementNamed('/admin-home');
+        } else if (state is AuthLoggedOut) {
+          Navigator.of(context).pushReplacementNamed('/login');
         }
       },
       child: BlocBuilder<AuthCubit, AuthState>(
@@ -86,7 +88,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Budi Santoso',
+                            authState is AuthSuccess ? authState.user.name : '',
                             style: TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w800,
@@ -117,66 +119,64 @@ class HomeScreen extends StatelessWidget {
                               Colors.transparent,
                               BlendMode.overlay,
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 42,
-                                    height: 42,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withAlpha(46),
-                                      borderRadius:
-                                          BorderRadius.circular(13),
-                                    ),
-                                    child: Center(
-                                      child: AppIcons.locationIcon(),
-                                    ),
+                        child: InkWell(
+                          onTap: () => context.read<AuthCubit>().updateLocation(),
+                          borderRadius: BorderRadius.circular(18),
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withAlpha(46),
+                                    borderRadius:
+                                        BorderRadius.circular(13),
                                   ),
-                                  SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Lokasi Anda',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.white
-                                                .withAlpha(166),
-                                            fontWeight: FontWeight.w600,
-                                            letterSpacing: 0.1,
-                                            textBaseline:
-                                                TextBaseline.alphabetic,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Jl. Mawar No. 12, Bandung',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Jawa Barat, Indonesia',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white
-                                                .withAlpha(140),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  child: Center(
+                                    child: AppIcons.locationIcon(),
                                   ),
-                                  Icon(Icons.arrow_forward_ios,
-                                      color: Colors.white.withAlpha(153),
-                                      size: 16),
-                                ],
-                              ),
+                                ),
+                                SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Lokasi Anda',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white
+                                              .withAlpha(166),
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.1,
+                                          textBaseline:
+                                              TextBaseline.alphabetic,
+                                        ),
+                                      ),
+                                      Text(
+                                        authState is AuthSuccess
+                                            ? authState.user.location
+                                            : '',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(Icons.my_location,
+                                    color: Colors.white.withAlpha(153),
+                                    size: 16),
+                              ],
                             ),
+                          ),
+                        ),
                           ),
                         ),
                       ),
@@ -226,21 +226,12 @@ class HomeScreen extends StatelessWidget {
                         Navigator.pushNamed(context, '/balance'),
                   ),
                   SizedBox(height: 16),
-                  BlocConsumer<AuthCubit, AuthState>(
-                    listener: (context, logoutState) {
-                      if (logoutState is AuthLoggedOut) {
-                        Navigator.of(context).pushReplacementNamed('/login');
-                      }
-                    },
-                    builder: (context, logoutState) {
-                      return SecondaryButton(
-                        label: 'Keluar',
-                        borderColor: Color(0xFFffcdd2),
-                        textColor: AppColors.error,
-                        onPressed: () {
-                          context.read<AuthCubit>().logout();
-                        },
-                      );
+                  SecondaryButton(
+                    label: 'Keluar',
+                    borderColor: Color(0xFFffcdd2),
+                    textColor: AppColors.error,
+                    onPressed: () {
+                      context.read<AuthCubit>().logout();
                     },
                   ),
                 ],

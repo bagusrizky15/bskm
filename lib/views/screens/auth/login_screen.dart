@@ -153,77 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
               ),
-
               SizedBox(height: 28),
-
-              // Divider
-              Row(
-                children: [
-                  Expanded(
-                    child: Divider(
-                      color: Color(0xFFE8F0E8),
-                      height: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      'atau',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textLight,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: Color(0xFFE8F0E8),
-                      height: 1,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 28),
-
-              // Google button
-              SecondaryButton(
-                label: 'Masuk dengan Google',
-                onPressed: () {},
-                icon: Icons.login,
-              ),
-
-              SizedBox(height: 24),
-
-              // Register link
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    context.read<AuthCubit>().emit(const AuthInitial());
-                    Navigator.of(context).pushNamed('/register');
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Belum punya akun? ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textGray,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Daftar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
