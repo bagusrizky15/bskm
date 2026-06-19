@@ -121,6 +121,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Login button
               BlocConsumer<AuthCubit, AuthState>(
+                listenWhen: (previous, current) {
+                  if (current is AuthFailure) {
+                    return current.operation == AuthOperation.login;
+                  }
+                  return true;
+                },
                 listener: (context, state) {
                   if (state is AuthSuccess) {
                     Navigator.of(context).pushReplacementNamed('/home');
@@ -190,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: GestureDetector(
                   onTap: () {
+                    context.read<AuthCubit>().emit(const AuthInitial());
                     Navigator.of(context).pushNamed('/register');
                   },
                   child: RichText(

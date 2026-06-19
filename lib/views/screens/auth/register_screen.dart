@@ -63,7 +63,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () {
+                          context.read<AuthCubit>().emit(const AuthInitial());
+                          Navigator.pop(context);
+                        },
                         borderRadius: BorderRadius.circular(13),
                         child: Icon(
                           Icons.arrow_back,
@@ -200,72 +203,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               SizedBox(height: 18),
 
-              // Terms checkbox
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 22,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() => _agreeToTerms = !_agreeToTerms);
-                        },
-                        borderRadius: BorderRadius.circular(7),
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 13,
+              // Register button
+              BlocConsumer<AuthCubit, AuthState>(
+                listenWhen: (previous, current) {
+                  if (current is AuthFailure) {
+                    return current.operation == AuthOperation.register;
+                  }
+                  return current is AuthRegisterSuccess || current is AuthFailure;
+                },
+                listener: (context, state) {
+                  if (state is AuthRegisterSuccess) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Pendaftaran Berhasil'),
+                        content: Text(
+                          'Link konfirmasi pendaftaran telah dikirimkan ke email ${state.email}, silakan lakukan konfirmasi dan login kembali',
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'Saya menyetujui ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textGray,
-                          height: 1.6,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Syarat & Ketentuan',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          TextSpan(text: ' dan '),
-                          TextSpan(
-                            text: 'Kebijakan Privasi',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                              context.read<AuthCubit>().emit(const AuthInitial());
+                              Navigator.of(context).pushReplacementNamed('/login');
+                            },
+                            child: const Text('OK'),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 18),
-
-              // Register button
-              BlocConsumer<AuthCubit, AuthState>(
-                listener: (context, state) {
-                  if (state is AuthSuccess) {
-                    Navigator.of(context).pushReplacementNamed('/home');
+                    );
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Pendaftaran gagal: ${state.message}')),
@@ -292,23 +259,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               // Login link
               Center(
-                child: RichText(
-                  text: TextSpan(
-                    text: 'Sudah punya akun? ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textGray,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: 'Masuk',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                child: GestureDetector(
+                  onTap: () {
+                    context.read<AuthCubit>().emit(const AuthInitial());
+                    Navigator.of(context).pop();
+                  },
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Sudah punya akun? ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textGray,
                       ),
-                    ],
+                      children: [
+                        TextSpan(
+                          text: 'Masuk',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

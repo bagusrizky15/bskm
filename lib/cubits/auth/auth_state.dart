@@ -25,13 +25,25 @@ class AuthSuccess extends AuthState {
   List<Object?> get props => [user];
 }
 
+enum AuthOperation { login, register, loginAdmin, logout }
+
 class AuthFailure extends AuthState {
   final String message;
+  final AuthOperation operation;
 
-  const AuthFailure(this.message);
+  const AuthFailure(this.message, this.operation);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, operation];
+}
+
+class AuthRegisterSuccess extends AuthState {
+  final String email;
+
+  const AuthRegisterSuccess(this.email);
+
+  @override
+  List<Object?> get props => [email];
 }
 
 class AuthLoggedOut extends AuthState {

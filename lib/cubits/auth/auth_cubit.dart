@@ -39,11 +39,14 @@ class AuthCubit extends Cubit<AuthState> {
           isAdmin: userData['is_admin'] ?? false,
         );
         emit(AuthSuccess(_currentUser!));
+      } else {
+        emit(const AuthFailure(
+            'Tidak ada respons dari server', AuthOperation.login));
       }
     } on AuthException catch (e) {
-      emit(AuthFailure(e.message));
+      emit(AuthFailure(e.message, AuthOperation.login));
     } catch (e) {
-      emit(AuthFailure('Login gagal: ${e.toString()}'));
+      emit(AuthFailure(e.toString(), AuthOperation.login));
     }
   }
 
@@ -59,11 +62,15 @@ class AuthCubit extends Cubit<AuthState> {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'name': fullName,
+          'phone': phone,
+        },
       );
 
       final user = response.user;
       if (user != null) {
-        await _supabase.from('users').insert({
+        await _supabase.from('users').upsert({
           'id': user.id,
           'name': fullName,
           'email': email,
@@ -72,20 +79,15 @@ class AuthCubit extends Cubit<AuthState> {
           'is_admin': false,
         });
 
-        _currentUser = UserModel(
-          id: user.id,
-          name: fullName,
-          email: email,
-          phone: phone,
-          location: 'Unknown',
-          isAdmin: false,
-        );
-        emit(AuthSuccess(_currentUser!));
+        emit(AuthRegisterSuccess(email));
+      } else {
+        emit(const AuthFailure(
+            'Tidak ada respons dari server', AuthOperation.register));
       }
     } on AuthException catch (e) {
-      emit(AuthFailure(e.message));
+      emit(AuthFailure(e.message, AuthOperation.register));
     } catch (e) {
-      emit(AuthFailure('Pendaftaran gagal: ${e.toString()}'));
+      emit(AuthFailure(e.toString(), AuthOperation.register));
     }
   }
 
@@ -116,11 +118,14 @@ class AuthCubit extends Cubit<AuthState> {
           isAdmin: true,
         );
         emit(AuthSuccess(_currentUser!));
+      } else {
+        emit(const AuthFailure(
+            'Tidak ada respons dari server', AuthOperation.loginAdmin));
       }
     } on AuthException catch (e) {
-      emit(AuthFailure(e.message));
+      emit(AuthFailure(e.message, AuthOperation.loginAdmin));
     } catch (e) {
-      emit(AuthFailure('Login admin gagal: ${e.toString()}'));
+      emit(AuthFailure(e.toString(), AuthOperation.loginAdmin));
     }
   }
 
@@ -131,7 +136,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(const AuthLoggedOut());
       emit(const AuthInitial());
     } catch (e) {
-      emit(AuthFailure('Logout gagal: ${e.toString()}'));
+      emit(AuthFailure(e.toString(), AuthOperation.logout));
     }
   }
 }
