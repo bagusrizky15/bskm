@@ -205,12 +205,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               // Register button
               BlocConsumer<AuthCubit, AuthState>(
-                listenWhen: (previous, current) {
-                  if (current is AuthFailure) {
-                    return current.operation == AuthOperation.register;
-                  }
-                  return current is AuthRegisterSuccess || current is AuthFailure;
-                },
+                listenWhen: (previous, current) =>
+                    (current is AuthRegisterSuccess ||
+                        (current is AuthFailure &&
+                            current.operation == AuthOperation.register)) &&
+                    previous != current,
                 listener: (context, state) {
                   if (state is AuthRegisterSuccess) {
                     showDialog(
@@ -234,9 +233,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     );
                   } else if (state is AuthFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Pendaftaran gagal: ${state.message}')),
-                    );
+                    ScaffoldMessenger.of(context)
+                      ..clearSnackBars()
+                      ..showSnackBar(
+                        SnackBar(
+                            content:
+                                Text('Pendaftaran gagal: ${state.message}')),
+                      );
                   }
                 },
                 builder: (context, state) {

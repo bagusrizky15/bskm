@@ -123,17 +123,21 @@ class _LoginScreenState extends State<LoginScreen> {
               BlocConsumer<AuthCubit, AuthState>(
                 listenWhen: (previous, current) {
                   if (current is AuthFailure) {
-                    return current.operation == AuthOperation.login;
+                    return current.operation == AuthOperation.login &&
+                        previous != current;
                   }
-                  return true;
+                  return current is AuthSuccess && previous != current;
                 },
                 listener: (context, state) {
                   if (state is AuthSuccess) {
                     Navigator.of(context).pushReplacementNamed('/home');
                   } else if (state is AuthFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Login gagal: ${state.message}')),
-                    );
+                    ScaffoldMessenger.of(context)
+                      ..clearSnackBars()
+                      ..showSnackBar(
+                        SnackBar(
+                            content: Text('Login gagal: ${state.message}')),
+                      );
                   }
                 },
                 builder: (context, state) {

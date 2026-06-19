@@ -70,15 +70,6 @@ class AuthCubit extends Cubit<AuthState> {
 
       final user = response.user;
       if (user != null) {
-        await _supabase.from('users').upsert({
-          'id': user.id,
-          'name': fullName,
-          'email': email,
-          'phone': phone,
-          'location': 'Unknown',
-          'is_admin': false,
-        });
-
         emit(AuthRegisterSuccess(email));
       } else {
         emit(const AuthFailure(
