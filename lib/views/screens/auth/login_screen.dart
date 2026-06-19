@@ -104,21 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               SizedBox(height: 28),
 
-              // Forgot password
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Lupa kata sandi?',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 28),
-
               // Login button
               BlocConsumer<AuthCubit, AuthState>(
                 listenWhen: (previous, current) {
