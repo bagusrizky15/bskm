@@ -123,9 +123,6 @@ class _PickupScreenState extends State<PickupScreen> {
                   final selectedCategory = state is PickupFormChanged
                       ? state.selectedCategory
                       : 'Plastik';
-                  final weight = state is PickupFormChanged
-                      ? state.weight
-                      : 2.5;
                   final estimatedPrice = state is PickupFormChanged
                       ? state.estimatedPrice
                       : 6250;
@@ -173,51 +170,26 @@ class _PickupScreenState extends State<PickupScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: AppColors.border,
-                                      width: 1.5,
+                                TextField(
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat',
+                                    suffixText: 'kg',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(13),
+                                      borderSide: BorderSide(
+                                        color: AppColors.border,
+                                        width: 1.5,
+                                      ),
                                     ),
-                                    borderRadius:
-                                        BorderRadius.circular(13),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 14),
-                                        child: Text(
-                                          weight.toString(),
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight:
-                                                FontWeight.w700,
-                                            color:
-                                                AppColors.textDark,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(right: 14),
-                                        child: Text(
-                                          'kg',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color:
-                                                AppColors.textLight,
-                                            fontWeight:
-                                                FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  onChanged: (value) {
+                                    final w = double.tryParse(value);
+                                    if (w != null && w > 0) {
+                                      context.read<PickupCubit>().setWeight(w);
+                                    }
+                                  },
                                 ),
                               ],
                             ),
@@ -373,41 +345,25 @@ class _PickupScreenState extends State<PickupScreen> {
                             ),
                           ),
                           SizedBox(height: 6),
-                          Container(
-                            constraints: BoxConstraints(minHeight: 70),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: AppColors.border,
-                                width: 1.5,
+                          TextField(
+                            controller: _addressController,
+                            minLines: 3,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan alamat lengkap…',
+                              hintStyle: TextStyle(
+                                color: AppColors.textLight,
+                                fontSize: 14,
                               ),
-                              borderRadius:
-                                  BorderRadius.circular(13),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Jl. Mawar No. 12, Bandung',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.textDark,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    'Jawa Barat, Indonesia',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textGray,
-                                    ),
-                                  ),
-                                ],
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(13),
+                                borderSide: BorderSide(
+                                  color: AppColors.border,
+                                  width: 1.5,
+                                ),
                               ),
+                              contentPadding: EdgeInsets.all(16),
                             ),
                           ),
                         ],
