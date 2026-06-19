@@ -218,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       builder: (ctx) => AlertDialog(
                         title: const Text('Pendaftaran Berhasil'),
                         content: Text(
-                          'Link konfirmasi pendaftaran telah dikirimkan ke email ${state.email}, silakan lakukan konfirmasi dan login kembali',
+                          'Silakan login menggunakan email ${state.email}',
                         ),
                         actions: [
                           TextButton(
