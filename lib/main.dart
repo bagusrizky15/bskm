@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme.dart';
+import 'config/env.dart';
 import 'cubits/auth/auth_cubit.dart';
 import 'cubits/home/home_cubit.dart';
 import 'cubits/pickup/pickup_cubit.dart';
@@ -22,8 +23,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   await Supabase.initialize(
-    url: 'https://wwxbugwspwykupurgdvc.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3eGJ1Z3dzcHd5a3VwdXJnZHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3OTI3MzMsImV4cCI6MjA5NzM2ODczM30.5mzsOXLeY8IesWgtzkXGqIvV9QogQXLPEe_boq--N48',
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
   
   runApp(MyApp());
