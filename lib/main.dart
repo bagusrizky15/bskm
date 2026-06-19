@@ -6,11 +6,13 @@ import 'cubits/auth/auth_cubit.dart';
 import 'cubits/home/home_cubit.dart';
 import 'cubits/pickup/pickup_cubit.dart';
 import 'cubits/admin/admin_cubit.dart';
+import 'cubits/balance/balance_cubit.dart';
 import 'views/screens/auth/splash_screen.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/auth/register_screen.dart';
 import 'views/screens/user/home_screen.dart';
 import 'views/screens/user/pickup_screen.dart';
+import 'views/screens/user/pickup_list_screen.dart';
 import 'views/screens/user/guide_screen.dart';
 import 'views/screens/user/balance_screen.dart';
 import 'views/screens/admin/admin_home_screen.dart';
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(create: (_) => PickupCubit()),
         BlocProvider(create: (_) => AdminCubit()),
+        BlocProvider(create: (_) => BalanceCubit()),
       ],
       child: MaterialApp(
         title: 'Bank Sampah',
@@ -51,7 +54,8 @@ class MyApp extends StatelessWidget {
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
           '/home': (_) => const HomeScreen(),
-          '/pickup': (_) => const PickupScreen(),
+          '/pickup': (_) => const PickupListScreen(),
+          '/pickup-form': (_) => const PickupScreen(),
           '/guide': (_) => const GuideScreen(),
           '/balance': (_) => const BalanceScreen(),
           '/admin-home': (_) => const AdminHomeScreen(),

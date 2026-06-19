@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/colors.dart';
-import '../../../models/waste_model.dart';
 import '../../widgets/custom_button.dart';
 
-class GuideScreen extends StatelessWidget {
-  const GuideScreen({Key? key}) : super(key: key);
+class GuideScreen extends StatefulWidget {
+  const GuideScreen({super.key});
+
+  @override
+  State<GuideScreen> createState() => _GuideScreenState();
+}
+
+class _GuideScreenState extends State<GuideScreen> {
+  late Future<List<Map<String, dynamic>>> _categoriesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoriesFuture = Supabase.instance.client
+        .from('categories')
+        .select()
+        .order('category', ascending: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +46,7 @@ class GuideScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 18),
-                  _buildCategorySection(),
+                  _buildCategorySection(context),
                   SizedBox(height: 20),
                   SecondaryButton(
                     label: 'Kembali',
@@ -100,7 +116,7 @@ class GuideScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySection() {
+  Widget _buildCategorySection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -123,19 +139,45 @@ class GuideScreen extends StatelessWidget {
           ],
         ),
         SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 9,
-            crossAxisSpacing: 9,
-            childAspectRatio: 1.1,
-          ),
-          itemCount: WasteCategory.values.length,
-          itemBuilder: (context, index) {
-            final category = WasteCategory.values[index];
-            return _CategoryCard(category: category);
+        FutureBuilder<List<Map<String, dynamic>>>(
+          future: _categoriesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Error loading categories',
+                  style: TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            final categories = snapshot.data ?? [];
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 9,
+                crossAxisSpacing: 9,
+                childAspectRatio: 1.1,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final cat = categories[index];
+                return _CategoryCardData(
+                  name: cat['category'],
+                  pricePerKg: cat['price_per_kg'],
+                );
+              },
+            );
           },
         ),
       ],
@@ -276,19 +318,23 @@ class _GuideItem extends StatelessWidget {
   }
 }
 
-class _CategoryCard extends StatelessWidget {
-  final WasteCategory category;
+class _CategoryCardData extends StatelessWidget {
+  final String name;
+  final int pricePerKg;
 
-  const _CategoryCard({required this.category});
+  const _CategoryCardData({
+    required this.name,
+    required this.pricePerKg,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = {
-      WasteCategory.paper: Color(0xFFE3F2FD),
-      WasteCategory.plastic: Color(0xFFE8F5E9),
-      WasteCategory.metal: Color(0xFFFFF3E0),
-      WasteCategory.glass: Color(0xFFF3E5F5),
-      WasteCategory.electronic: Color(0xFFE0F2F1),
+      'Kertas': Color(0xFFE3F2FD),
+      'Plastik': Color(0xFFE8F5E9),
+      'Logam': Color(0xFFFFF3E0),
+      'Kaca': Color(0xFFF3E5F5),
+      'Elektronik': Color(0xFFE0F2F1),
     };
 
     return Container(
@@ -310,7 +356,7 @@ class _CategoryCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: colors[category] ?? Color(0xFFE8F5E9),
+              color: colors[name] ?? Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -319,7 +365,7 @@ class _CategoryCard extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            category.name,
+            name,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -329,7 +375,7 @@ class _CategoryCard extends StatelessWidget {
           ),
           SizedBox(height: 2),
           Text(
-            'Rp ${category.pricePerKg}/kg',
+            'Rp $pricePerKg/kg',
             style: TextStyle(
               fontSize: 10,
               color: AppColors.textGray,

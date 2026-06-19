@@ -139,6 +139,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               SizedBox(height: 28),
+
+              // Register link
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Belum punya akun? ',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textGray,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pushReplacementNamed('/register'),
+                      child: Text(
+                        'Daftar di sini',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
