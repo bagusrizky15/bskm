@@ -15,8 +15,8 @@ class AdminHomeScreen extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<AdminCubit, AdminState>(
         builder: (context, state) {
-          final totalUsers = state is AdminLoaded ? state.totalUsers : 138;
-          final totalWaste = state is AdminLoaded ? state.totalWaste : 52;
+          final totalUsers = state is AdminLoaded ? state.totalUsers : 0;
+          final totalWaste = state is AdminLoaded ? state.totalWaste : 0;
 
           return SingleChildScrollView(
             child: Column(

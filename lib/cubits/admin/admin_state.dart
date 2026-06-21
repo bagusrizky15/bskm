@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import '../../models/waste_model.dart';
 
 abstract class AdminState extends Equatable {
   const AdminState();
@@ -12,26 +11,18 @@ class AdminInitial extends AdminState {
   const AdminInitial();
 }
 
+class AdminLoading extends AdminState {
+  const AdminLoading();
+}
+
 class AdminLoaded extends AdminState {
-  final List<WastePickup> pickups;
-  final PickupStatus? selectedFilter;
   final int totalUsers;
   final int totalWaste;
 
-  const AdminLoaded({
-    required this.pickups,
-    this.selectedFilter,
-    required this.totalUsers,
-    required this.totalWaste,
-  });
+  const AdminLoaded({required this.totalUsers, required this.totalWaste});
 
   @override
-  List<Object?> get props =>
-      [pickups, selectedFilter, totalUsers, totalWaste];
-}
-
-class AdminLoading extends AdminState {
-  const AdminLoading();
+  List<Object?> get props => [totalUsers, totalWaste];
 }
 
 class AdminFailure extends AdminState {

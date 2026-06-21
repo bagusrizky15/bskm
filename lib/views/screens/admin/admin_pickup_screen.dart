@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
 import '../../../models/waste_model.dart';
-import '../../../cubits/admin/admin_cubit.dart';
-import '../../../cubits/admin/admin_state.dart';
+import '../../../cubits/admin_pickup/admin_pickup_cubit.dart';
+import '../../../cubits/admin_pickup/admin_pickup_state.dart';
 import '../../widgets/custom_button.dart';
 
 class AdminPickupScreen extends StatelessWidget {
@@ -16,9 +16,22 @@ class AdminPickupScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildHeader(context),
-            BlocBuilder<AdminCubit, AdminState>(
+            BlocBuilder<AdminPickupCubit, AdminPickupState>(
               builder: (context, state) {
-                final pickups = state is AdminLoaded ? state.pickups : <WastePickup>[];
+                if (state is AdminPickupFailure) {
+                  return Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text('Error: ${state.message}'),
+                  );
+                }
+                if (state is AdminPickupLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final pickups =
+                    state is AdminPickupLoaded ? state.pickups : <WastePickup>[];
                 return Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -94,21 +107,21 @@ class AdminPickupScreen extends StatelessWidget {
                     _FilterChip(
                       label: 'Semua',
                       active: true,
-                      onTap: () => context.read<AdminCubit>().setFilter(null),
+                      onTap: () => context.read<AdminPickupCubit>().setFilter(null),
                     ),
                     SizedBox(width: 8),
                     _FilterChip(
                       label: 'Menunggu',
                       active: false,
                       onTap: () =>
-                          context.read<AdminCubit>().setFilter(PickupStatus.waiting),
+                          context.read<AdminPickupCubit>().setFilter(PickupStatus.waiting),
                     ),
                     SizedBox(width: 8),
                     _FilterChip(
                       label: 'Dikonfirmasi',
                       active: false,
                       onTap: () =>
-                          context.read<AdminCubit>().setFilter(PickupStatus.confirmed),
+                          context.read<AdminPickupCubit>().setFilter(PickupStatus.confirmed),
                     ),
                   ],
                 ),
@@ -461,7 +474,7 @@ class _PickupDetailSheet extends StatelessWidget {
                   borderColor: Color(0xFFffcdd2),
                   textColor: AppColors.error,
                   onPressed: () {
-                    context.read<AdminCubit>().rejectPickup(pickup.id);
+                    context.read<AdminPickupCubit>().rejectPickup(pickup.id);
                     Navigator.pop(context);
                   },
                 ),
@@ -472,7 +485,7 @@ class _PickupDetailSheet extends StatelessWidget {
                 child: PrimaryButton(
                   label: 'Konfirmasi',
                   onPressed: () {
-                    context.read<AdminCubit>().confirmPickup(pickup.id);
+                    context.read<AdminPickupCubit>().confirmPickup(pickup.id);
                     Navigator.pop(context);
                   },
                 ),

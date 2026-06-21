@@ -6,6 +6,9 @@ import 'cubits/auth/auth_cubit.dart';
 import 'cubits/home/home_cubit.dart';
 import 'cubits/pickup/pickup_cubit.dart';
 import 'cubits/admin/admin_cubit.dart';
+import 'cubits/admin_pickup/admin_pickup_cubit.dart';
+import 'cubits/admin_balance/admin_balance_cubit.dart';
+import 'cubits/admin_category/admin_category_cubit.dart';
 import 'cubits/balance/balance_cubit.dart';
 import 'views/screens/auth/splash_screen.dart';
 import 'views/screens/auth/login_screen.dart';
@@ -43,6 +46,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(create: (_) => PickupCubit()),
         BlocProvider(create: (_) => AdminCubit()),
+        BlocProvider(create: (_) => AdminPickupCubit()),
+        BlocProvider(create: (_) => AdminBalanceCubit()),
+        BlocProvider(create: (_) => AdminCategoryCubit()),
         BlocProvider(create: (_) => BalanceCubit()),
       ],
       child: MaterialApp(
