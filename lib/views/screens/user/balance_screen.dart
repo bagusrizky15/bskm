@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
 import '../../../cubits/balance/balance_cubit.dart';
 import '../../../cubits/balance/balance_state.dart';
+import '../../../models/balance_model.dart';
 import '../../widgets/custom_button.dart';
 
 class BalanceScreen extends StatefulWidget {
@@ -154,6 +155,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _BankAccountCard(
+            bankAccount: state.bankAccount,
+            onTap: () => _showBankDialog(context, state.bankAccount),
+          ),
+          SizedBox(height: 20),
           Text(
             'Riwayat Penarikan',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textDark),
@@ -185,9 +191,24 @@ class _BalanceScreenState extends State<BalanceScreen> {
   }
 
   void _showWithdrawalDialog(BuildContext context, int balance) {
+    final cubit = context.read<BalanceCubit>();
     showDialog(
       context: context,
-      builder: (context) => _WithdrawalDialog(maxAmount: balance),
+      builder: (ctx) => BlocProvider.value(
+        value: cubit,
+        child: _WithdrawalDialog(maxAmount: balance),
+      ),
+    );
+  }
+
+  void _showBankDialog(BuildContext context, BankAccount? existing) {
+    final cubit = context.read<BalanceCubit>();
+    showDialog(
+      context: context,
+      builder: (ctx) => BlocProvider.value(
+        value: cubit,
+        child: _BankAccountDialog(existing: existing),
+      ),
     );
   }
 }
@@ -335,6 +356,142 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
             Navigator.pop(context);
           },
           child: Text('Tarik'),
+        ),
+      ],
+    );
+  }
+}
+
+class _BankAccountCard extends StatelessWidget {
+  final BankAccount? bankAccount;
+  final VoidCallback onTap;
+
+  const _BankAccountCard({required this.bankAccount, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withAlpha(15),
+                blurRadius: 6,
+                offset: const Offset(0, 1))
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(13)),
+                child: Icon(Icons.account_balance, color: AppColors.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: bankAccount == null
+                    ? Text('Tambah Rekening Bank',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark))
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(bankAccount!.nameAccount,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textDark)),
+                          const SizedBox(height: 2),
+                          Text(bankAccount!.numberAccount,
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.textGray)),
+                        ],
+                      ),
+              ),
+              Icon(Icons.chevron_right, color: AppColors.textGray, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BankAccountDialog extends StatefulWidget {
+  final BankAccount? existing;
+
+  const _BankAccountDialog({this.existing});
+
+  @override
+  State<_BankAccountDialog> createState() => _BankAccountDialogState();
+}
+
+class _BankAccountDialogState extends State<_BankAccountDialog> {
+  late TextEditingController _nameCtrl;
+  late TextEditingController _numberCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.existing?.nameAccount ?? '');
+    _numberCtrl =
+        TextEditingController(text: widget.existing?.numberAccount ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _numberCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.existing == null ? 'Tambah Rekening' : 'Edit Rekening'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _nameCtrl,
+            decoration: InputDecoration(
+              labelText: 'Nama Pemilik Rekening',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _numberCtrl,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Nomor Rekening',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+        TextButton(
+          onPressed: () {
+            final name = _nameCtrl.text.trim();
+            final number = _numberCtrl.text.trim();
+            if (name.isEmpty || number.isEmpty) return;
+            context.read<BalanceCubit>().saveBankAccount(name, number);
+            Navigator.pop(context);
+          },
+          child: const Text('Simpan'),
         ),
       ],
     );

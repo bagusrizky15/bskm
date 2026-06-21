@@ -35,7 +35,20 @@ class AdminBalanceCubit extends Cubit<AdminBalanceState> {
         for (final u in usersData as List) u['id'] as String: u['name'] as String
       };
 
+      final bankData = userIds.isEmpty
+          ? []
+          : await _supabase
+              .from('bank_accounts')
+              .select('user_id, name_account, number_account')
+              .inFilter('user_id', userIds);
+
+      final bankMap = {
+        for (final b in bankData as List)
+          b['user_id'] as String: b,
+      };
+
       _all = data.map<AdminWithdrawal>((w) {
+        final bank = bankMap[w['user_id'] as String];
         return AdminWithdrawal(
           id: w['id'].toString(),
           userId: w['user_id'],
@@ -43,6 +56,8 @@ class AdminBalanceCubit extends Cubit<AdminBalanceState> {
           amount: (w['amount'] as num).toInt(),
           status: w['status'] ?? 'pending',
           createdAt: DateTime.parse(w['created_at']),
+          bankName: bank?['name_account'],
+          bankNumber: bank?['number_account'],
         );
       }).toList();
 

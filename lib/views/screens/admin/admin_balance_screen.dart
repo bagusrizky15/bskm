@@ -413,6 +413,10 @@ class _WithdrawalDetailSheet extends StatelessWidget {
                   value:
                       '${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}',
                 ),
+                if (item.bankName != null)
+                  _DetailRow(label: 'Nama Rekening', value: item.bankName!),
+                if (item.bankNumber != null)
+                  _DetailRow(label: 'No. Rekening', value: item.bankNumber!),
                 _DetailRow(
                     label: 'Status',
                     value: item.status == 'pending'

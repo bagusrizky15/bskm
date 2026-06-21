@@ -19,14 +19,16 @@ class BalanceLoading extends BalanceState {
 class BalanceLoaded extends BalanceState {
   final UserBalance balance;
   final List<Withdrawal> withdrawals;
+  final BankAccount? bankAccount;
 
   const BalanceLoaded({
     required this.balance,
     required this.withdrawals,
+    this.bankAccount,
   });
 
   @override
-  List<Object?> get props => [balance, withdrawals];
+  List<Object?> get props => [balance, withdrawals, bankAccount];
 }
 
 class BalanceFailure extends BalanceState {

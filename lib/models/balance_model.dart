@@ -17,6 +17,24 @@ enum WithdrawalStatus {
   String get name => toString().split('.').last;
 }
 
+class BankAccount {
+  final String userId;
+  final String nameAccount;
+  final String numberAccount;
+
+  BankAccount({
+    required this.userId,
+    required this.nameAccount,
+    required this.numberAccount,
+  });
+
+  factory BankAccount.fromJson(Map<String, dynamic> json) => BankAccount(
+        userId: json['user_id'],
+        nameAccount: json['name_account'],
+        numberAccount: json['number_account'],
+      );
+}
+
 class BalanceTransaction {
   final String id;
   final TransactionType type;

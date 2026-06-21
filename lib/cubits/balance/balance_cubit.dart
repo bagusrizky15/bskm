@@ -36,15 +36,37 @@ class BalanceCubit extends Cubit<BalanceState> {
           .eq('user_id', userId)
           .order('created_at', ascending: false);
 
+      final bankData = await Supabase.instance.client
+          .from('bank_accounts')
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
+
       final balance = UserBalance.fromJson(balanceData);
       final withdrawals = (withdrawalsData as List)
           .map((w) => Withdrawal.fromJson(w))
           .toList();
+      final bankAccount =
+          bankData != null ? BankAccount.fromJson(bankData) : null;
 
-      emit(BalanceLoaded(balance: balance, withdrawals: withdrawals));
+      emit(BalanceLoaded(
+          balance: balance,
+          withdrawals: withdrawals,
+          bankAccount: bankAccount));
     } catch (e) {
       emit(BalanceFailure(e.toString()));
     }
+  }
+
+  Future<void> saveBankAccount(String nameAccount, String numberAccount) async {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) return;
+    await Supabase.instance.client.from('bank_accounts').upsert({
+      'user_id': userId,
+      'name_account': nameAccount,
+      'number_account': numberAccount,
+    }, onConflict: 'user_id');
+    await fetchBalance();
   }
 
   Future<void> requestWithdrawal(int amount) async {

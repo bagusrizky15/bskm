@@ -7,6 +7,8 @@ class AdminWithdrawal {
   final int amount;
   final String status;
   final DateTime createdAt;
+  final String? bankName;
+  final String? bankNumber;
 
   const AdminWithdrawal({
     required this.id,
@@ -15,6 +17,8 @@ class AdminWithdrawal {
     required this.amount,
     required this.status,
     required this.createdAt,
+    this.bankName,
+    this.bankNumber,
   });
 }
 
