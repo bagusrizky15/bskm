@@ -101,6 +101,18 @@ class AuthCubit extends Cubit<AuthState> {
 
       final user = response.user;
       if (user != null) {
+        // ponytail: upsert profile from client when we have a session;
+        // surfaces real Postgres errors instead of GoTrue's generic
+        // "Database error saving user". Needs INSERT RLS policy (see migration).
+        // If email confirmation is on (no session), the DB trigger handles it.
+        if (response.session != null) {
+          await _supabase.from('users').upsert({
+            'id': user.id,
+            'name': fullName,
+            'email': email,
+            'phone': phone,
+          });
+        }
         emit(AuthRegisterSuccess(email));
       } else {
         emit(const AuthFailure(

@@ -19,19 +19,15 @@ class BalanceCubit extends Cubit<BalanceState> {
           .maybeSingle();
 
       if (balanceData == null) {
-        await Supabase.instance.client.from('balances').insert({
-          'user_id': userId,
-          'balance': 0,
-          'total': 0,
-          'withdrawn': 0,
-        });
-        balanceData = {
-          'id': null,
-          'user_id': userId,
-          'balance': 0,
-          'total': 0,
-          'withdrawn': 0,
-        };
+        balanceData = await Supabase.instance.client
+            .from('balances')
+            .insert({
+              'user_id': userId,
+              'total': 0,
+              'withdrawn': 0,
+            })
+            .select()
+            .single();
       }
 
       final withdrawalsData = await Supabase.instance.client

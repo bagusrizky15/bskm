@@ -223,9 +223,8 @@ class _BalanceScreenState extends State<BalanceScreen> {
           PrimaryButton(
             label: 'Tarik Saldo',
             icon: Icons.account_balance_wallet,
-            onPressed: state.balance.balance > 0
-                ? () => _showWithdrawalDialog(context, state.balance.balance)
-                : () {},
+            onPressed: () =>
+                _showWithdrawalDialog(context, state.balance.balance),
           ),
         ],
       ),
@@ -369,6 +368,7 @@ class _WithdrawalDialog extends StatefulWidget {
 
 class _WithdrawalDialogState extends State<_WithdrawalDialog> {
   late TextEditingController _amountController;
+  String? _error;
 
   @override
   void initState() {
@@ -399,6 +399,7 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               hintText: 'Jumlah penarikan',
+              errorText: _error,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -414,10 +415,17 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
         TextButton(
           onPressed: () {
             final amount = int.tryParse(_amountController.text);
-            if (amount != null && amount > 0) {
-              context.read<BalanceCubit>().requestWithdrawal(amount);
-              Navigator.pop(context);
+            if (amount == null || amount <= 0) {
+              setState(() => _error = 'Masukkan jumlah yang valid');
+              return;
             }
+            if (amount > widget.maxAmount) {
+              setState(() => _error =
+                  'Jumlah melebihi saldo (Rp ${widget.maxAmount})');
+              return;
+            }
+            context.read<BalanceCubit>().requestWithdrawal(amount);
+            Navigator.pop(context);
           },
           child: Text('Tarik'),
         ),
