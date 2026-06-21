@@ -46,35 +46,6 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(
-                        left: 24,
-                        right: 24,
-                        top: 18,
-                        bottom: 18,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '9:41',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white.withAlpha(230),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.signal_cellular_4_bar,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 5),
-                              Icon(Icons.wifi, color: Colors.white, size: 14),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +174,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 14),
                   _MenuCard(
-                    icon: AppIcons.truckIcon(),
+                    icon: Icon(Icons.local_shipping_rounded, color: AppColors.primary, size: 28),
                     title: 'Jemput Sampah',
                     subtitle: 'Jadwalkan pengambilan sampah',
                     onTap: () =>
@@ -211,7 +182,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   _MenuCard(
-                    icon: AppIcons.guideIcon(),
+                    icon: Icon(Icons.menu_book_rounded, color: AppColors.primary, size: 28),
                     title: 'Panduan Pengiriman',
                     subtitle: 'Cara memilah & mengirim sampah',
                     onTap: () =>
@@ -219,7 +190,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   _MenuCard(
-                    icon: AppIcons.balanceIcon(),
+                    icon: Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary, size: 28),
                     title: 'Saldo',
                     subtitle: 'Lihat & tarik saldo tabungan',
                     onTap: () =>
