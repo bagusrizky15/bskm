@@ -12,24 +12,6 @@ class PickupInitial extends PickupState {
   const PickupInitial();
 }
 
-class PickupFormChanged extends PickupState {
-  final String selectedCategory;
-  final double weight;
-  final int estimatedPrice;
-  final DateTime selectedDate;
-
-  const PickupFormChanged({
-    required this.selectedCategory,
-    required this.weight,
-    required this.estimatedPrice,
-    required this.selectedDate,
-  });
-
-  @override
-  List<Object?> get props =>
-      [selectedCategory, weight, estimatedPrice, selectedDate];
-}
-
 class PickupSubmitting extends PickupState {
   const PickupSubmitting();
 }

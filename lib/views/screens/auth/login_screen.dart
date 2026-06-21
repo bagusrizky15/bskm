@@ -115,7 +115,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 listener: (context, state) {
                   if (state is AuthSuccess) {
-                    Navigator.of(context).pushReplacementNamed('/home');
+                    Navigator.of(context).pushReplacementNamed(
+                        state.user.isAdmin ? '/admin-home' : '/home');
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context)
                       ..clearSnackBars()

@@ -62,12 +62,40 @@ class AdminPickupCubit extends Cubit<AdminPickupState> {
     _emitLoaded();
   }
 
-  Future<void> confirmPickup(String pickupId) async {
-    await _updateStatus(pickupId, 'confirmed');
+  Future<void> confirmPickup(WastePickup pickup) async {
+    try {
+      // only credit balance on first confirm (from waiting)
+      if (pickup.status == PickupStatus.waiting) {
+        await _addBalance(pickup.userId, pickup.estimatedPrice);
+      }
+      await _updateStatus(pickup.id, 'confirmed');
+    } catch (e) {
+      emit(AdminPickupFailure(e.toString()));
+    }
   }
 
   Future<void> rejectPickup(String pickupId) async {
     await _updateStatus(pickupId, 'rejected');
+  }
+
+  Future<void> _addBalance(String userId, int amount) async {
+    final existing = await _supabase
+        .from('balances')
+        .select('total')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (existing == null) {
+      await _supabase
+          .from('balances')
+          .insert({'user_id': userId, 'total': amount, 'withdrawn': 0});
+    } else {
+      final current = (existing['total'] as num).toInt();
+      await _supabase
+          .from('balances')
+          .update({'total': current + amount})
+          .eq('user_id', userId);
+    }
   }
 
   Future<void> _updateStatus(String pickupId, String status) async {

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
-import '../../../models/waste_model.dart';
 import '../../../cubits/pickup/pickup_cubit.dart';
 import '../../../cubits/pickup/pickup_state.dart';
+import '../../../cubits/admin_category/admin_category_cubit.dart';
+import '../../../cubits/admin_category/admin_category_state.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
 class PickupScreen extends StatefulWidget {
-  const PickupScreen({Key? key}) : super(key: key);
+  const PickupScreen({super.key});
 
   @override
   State<PickupScreen> createState() => _PickupScreenState();
@@ -18,6 +19,9 @@ class _PickupScreenState extends State<PickupScreen> {
   late TextEditingController _nameController;
   late TextEditingController _addressController;
   late TextEditingController _notesController;
+  String? _selectedCategory;
+  double _weight = 0;
+  late DateTime _selectedDate;
 
   @override
   void initState() {
@@ -25,6 +29,7 @@ class _PickupScreenState extends State<PickupScreen> {
     _nameController = TextEditingController();
     _addressController = TextEditingController();
     _notesController = TextEditingController();
+    _selectedDate = DateTime.now().add(const Duration(days: 1));
   }
 
   @override
@@ -68,8 +73,7 @@ class _PickupScreenState extends State<PickupScreen> {
                                 color: Colors.white.withAlpha(38),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(Icons.arrow_back,
-                                  color: Colors.white, size: 18),
+                              child: Icon(Icons.arrow_back, color: Colors.white, size: 18),
                             ),
                           ),
                           SizedBox(width: 12),
@@ -87,10 +91,7 @@ class _PickupScreenState extends State<PickupScreen> {
                               ),
                               Text(
                                 'Isi data pengambilan sampah',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white.withAlpha(153),
-                                ),
+                                style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(153)),
                               ),
                             ],
                           ),
@@ -108,51 +109,50 @@ class _PickupScreenState extends State<PickupScreen> {
               child: BlocConsumer<PickupCubit, PickupState>(
                 listener: (context, state) {
                   if (state is PickupSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Penjemputan berhasil diajukan')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('Penjemputan berhasil diajukan')));
                     Navigator.pop(context);
                   } else if (state is PickupFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${state.message}')),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${state.message}')));
                   }
                 },
                 builder: (context, state) {
                   final isSubmitting = state is PickupSubmitting;
-                  final selectedCategory = state is PickupFormChanged
-                      ? state.selectedCategory
-                      : 'Plastik';
-                  final estimatedPrice = state is PickupFormChanged
-                      ? state.estimatedPrice
-                      : 6250;
-                  final selectedDate = state is PickupFormChanged
-                      ? state.selectedDate
-                      : DateTime(2026, 6, 20);
+
+                  final catState = context.watch<AdminCategoryCubit>().state;
+                  final categories = catState is AdminCategoryLoaded ? catState.categories : <CategoryModel>[];
+
+                  final byName = <String, CategoryModel>{for (final c in categories) c.name: c};
+                  final categoryNames = byName.keys.toList();
+                  final categoryItems = categoryNames
+                      .map((name) => DropdownMenuItem(value: name, child: Text(name)))
+                      .toList();
+
+                  final validCategory = _selectedCategory != null && categoryNames.contains(_selectedCategory)
+                      ? _selectedCategory
+                      : (categoryNames.isNotEmpty ? categoryNames.first : null);
+
+                  final pricePerKg = validCategory != null ? byName[validCategory]!.pricePerKg : 0;
+                  final estimatedPrice = _weight > 0 ? (pricePerKg * _weight).toInt() : pricePerKg;
 
                   return Column(
                     children: [
-                      CustomTextField(
-                        label: 'Nama',
-                        hintText: 'Masukkan nama lengkap',
-                        controller: _nameController,
-                      ),
+                      CustomTextField(label: 'Nama', hintText: 'Masukkan nama lengkap', controller: _nameController),
                       SizedBox(height: 13),
-                      CustomDropdown<String>(
-                        label: 'Kategori Sampah',
-                        value: selectedCategory,
-                        items: WasteCategory.values
-                            .map((cat) => DropdownMenuItem(
-                              value: cat.name,
-                              child: Text(cat.name),
-                            ))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            context.read<PickupCubit>().setCategory(value);
-                          }
-                        },
-                      ),
+                      if (categoryItems.isEmpty)
+                        const Center(child: CircularProgressIndicator())
+                      else
+                        CustomDropdown<String>(
+                          label: 'Kategori Sampah',
+                          value: validCategory ?? categoryItems.first.value!,
+                          items: categoryItems,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _selectedCategory = value);
+                            }
+                          },
+                        ),
                       SizedBox(height: 13),
                       Row(
                         children: [
@@ -171,24 +171,19 @@ class _PickupScreenState extends State<PickupScreen> {
                                 ),
                                 SizedBox(height: 6),
                                 TextField(
-                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat',
                                     suffixText: 'kg',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(13),
-                                      borderSide: BorderSide(
-                                        color: AppColors.border,
-                                        width: 1.5,
-                                      ),
+                                      borderSide: BorderSide(color: AppColors.border, width: 1.5),
                                     ),
                                     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                   ),
                                   onChanged: (value) {
-                                    final w = double.tryParse(value);
-                                    if (w != null && w > 0) {
-                                      context.read<PickupCubit>().setWeight(w);
-                                    }
+                                    final w = double.tryParse(value) ?? 0;
+                                    setState(() => _weight = w);
                                   },
                                 ),
                               ],
@@ -213,40 +208,26 @@ class _PickupScreenState extends State<PickupScreen> {
                                   height: 50,
                                   decoration: BoxDecoration(
                                     color: AppColors.bgSecondary,
-                                    border: Border.all(
-                                      color: AppColors.divider,
-                                      width: 1.5,
-                                    ),
-                                    borderRadius:
-                                        BorderRadius.circular(13),
+                                    border: Border.all(color: AppColors.divider, width: 1.5),
+                                    borderRadius: BorderRadius.circular(13),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 14),
+                                        padding: EdgeInsets.only(left: 14),
                                         child: Text(
                                           'Rp $estimatedPrice',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            fontWeight:
-                                                FontWeight.w700,
-                                            color:
-                                                AppColors.primary,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.primary,
                                           ),
                                         ),
                                       ),
                                       Padding(
-                                        padding:
-                                            EdgeInsets.only(right: 14),
-                                        child: Icon(
-                                          Icons.add,
-                                          color:
-                                              AppColors.textLight,
-                                          size: 14,
-                                        ),
+                                        padding: EdgeInsets.only(right: 14),
+                                        child: Icon(Icons.add, color: AppColors.textLight, size: 14),
                                       ),
                                     ],
                                   ),
@@ -283,47 +264,35 @@ class _PickupScreenState extends State<PickupScreen> {
                             onTap: () async {
                               final date = await showDatePicker(
                                 context: context,
-                                initialDate: selectedDate,
+                                initialDate: _selectedDate,
                                 firstDate: DateTime.now(),
-                                lastDate: DateTime.now()
-                                    .add(Duration(days: 30)),
+                                lastDate: DateTime.now().add(Duration(days: 30)),
                               );
-                              if (date != null && context.mounted) {
-                                context.read<PickupCubit>().setDate(date);
+                              if (date != null) {
+                                setState(() => _selectedDate = date);
                               }
                             },
                             child: Container(
                               height: 50,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                border: Border.all(
-                                  color: AppColors.border,
-                                  width: 1.5,
-                                ),
-                                borderRadius:
-                                    BorderRadius.circular(13),
+                                border: Border.all(color: AppColors.border, width: 1.5),
+                                borderRadius: BorderRadius.circular(13),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                padding: EdgeInsets.symmetric(horizontal: 16),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      '${selectedDate.day} ${_getMonthName(selectedDate.month)} ${selectedDate.year}',
+                                      '${_selectedDate.day} ${_getMonthName(_selectedDate.month)} ${_selectedDate.year}',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color:
-                                            AppColors.textDark,
-                                        fontWeight:
-                                            FontWeight.w500,
+                                        color: AppColors.textDark,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    Icon(Icons.calendar_today,
-                                        color: AppColors.primary,
-                                        size: 20),
+                                    Icon(Icons.calendar_today, color: AppColors.primary, size: 20),
                                   ],
                                 ),
                               ),
@@ -351,17 +320,10 @@ class _PickupScreenState extends State<PickupScreen> {
                             maxLines: 3,
                             decoration: InputDecoration(
                               hintText: 'Masukkan alamat lengkap…',
-                              hintStyle: TextStyle(
-                                color: AppColors.textLight,
-                                fontSize: 14,
-                              ),
+                              hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
                               border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(13),
-                                borderSide: BorderSide(
-                                  color: AppColors.border,
-                                  width: 1.5,
-                                ),
+                                borderRadius: BorderRadius.circular(13),
+                                borderSide: BorderSide(color: AppColors.border, width: 1.5),
                               ),
                               contentPadding: EdgeInsets.all(16),
                             ),
@@ -388,17 +350,10 @@ class _PickupScreenState extends State<PickupScreen> {
                             maxLines: 3,
                             decoration: InputDecoration(
                               hintText: 'Tambahkan catatan untuk petugas…',
-                              hintStyle: TextStyle(
-                                color: AppColors.textLight,
-                                fontSize: 14,
-                              ),
+                              hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
                               border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(13),
-                                borderSide: BorderSide(
-                                  color: AppColors.border,
-                                  width: 1.5,
-                                ),
+                                borderRadius: BorderRadius.circular(13),
+                                borderSide: BorderSide(color: AppColors.border, width: 1.5),
                               ),
                               contentPadding: EdgeInsets.all(16),
                             ),
@@ -411,10 +366,21 @@ class _PickupScreenState extends State<PickupScreen> {
                         icon: Icons.check,
                         isLoading: isSubmitting,
                         onPressed: () {
+                          final error = _validate(validCategory);
+                          if (error != null) {
+                            ScaffoldMessenger.of(context)
+                              ..clearSnackBars()
+                              ..showSnackBar(SnackBar(content: Text(error)));
+                            return;
+                          }
                           context.read<PickupCubit>().submitPickup(
-                            _nameController.text,
-                            _addressController.text,
-                            _notesController.text,
+                            name: _nameController.text.trim(),
+                            category: validCategory!,
+                            weight: _weight,
+                            price: estimatedPrice,
+                            pickupDate: _selectedDate,
+                            address: _addressController.text.trim(),
+                            notes: _notesController.text.trim(),
                           );
                         },
                       ),
@@ -429,21 +395,16 @@ class _PickupScreenState extends State<PickupScreen> {
     );
   }
 
+  String? _validate(String? category) {
+    if (_nameController.text.trim().isEmpty) return 'Nama wajib diisi';
+    if (category == null) return 'Pilih kategori dulu';
+    if (_weight <= 0) return 'Berat harus lebih dari 0';
+    if (_addressController.text.trim().isEmpty) return 'Alamat wajib diisi';
+    return null;
+  }
+
   String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
   }
 }

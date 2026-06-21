@@ -13,6 +13,8 @@ enum WithdrawalStatus {
 
   final String label;
   const WithdrawalStatus(this.label);
+
+  String get name => toString().split('.').last;
 }
 
 class BalanceTransaction {
@@ -98,7 +100,7 @@ class Withdrawal {
       userId: json['user_id'],
       amount: json['amount'],
       status: WithdrawalStatus.values.firstWhere(
-        (s) => s.name == json['status'],
+        (s) => s.toString().split('.').last == json['status'],
         orElse: () => WithdrawalStatus.pending,
       ),
       createdAt: DateTime.parse(json['created_at']),

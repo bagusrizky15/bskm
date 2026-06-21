@@ -210,8 +210,11 @@ class _PickupListScreenState extends State<PickupListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, '/pickup-form');
+        onPressed: () async {
+          await Navigator.pushNamed(context, '/pickup-form');
+          if (context.mounted) {
+            context.read<PickupCubit>().fetchPickups();
+          }
         },
         backgroundColor: AppColors.primary,
         icon: Icon(Icons.add),

@@ -485,7 +485,7 @@ class _PickupDetailSheet extends StatelessWidget {
                 child: PrimaryButton(
                   label: 'Konfirmasi',
                   onPressed: () {
-                    context.read<AdminPickupCubit>().confirmPickup(pickup.id);
+                    context.read<AdminPickupCubit>().confirmPickup(pickup);
                     Navigator.pop(context);
                   },
                 ),

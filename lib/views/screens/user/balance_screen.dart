@@ -26,18 +26,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
         builder: (context, state) {
           if (state is BalanceLoaded) {
             return SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildHeader(context, state.balance),
-                  _buildWithdrawalList(context, state),
-                ],
-              ),
+              child: Column(children: [_buildHeader(context, state.balance), _buildWithdrawalList(context, state)]),
             );
           }
           if (state is BalanceFailure) {
-            return Center(
-              child: Text('Error: ${state.message}'),
-            );
+            return Center(child: Text('Error: ${state.message}'));
           }
           return const Center(child: CircularProgressIndicator());
         },
@@ -47,11 +40,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
 
   Widget _buildHeader(BuildContext context, dynamic balance) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF0d3b0d), Color(0xFF1B5E20)],
-        ),
-      ),
+      decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF0d3b0d), Color(0xFF1B5E20)])),
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -70,8 +59,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
                         color: Colors.white.withAlpha(38),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.arrow_back,
-                          color: Colors.white, size: 18),
+                      child: Icon(Icons.arrow_back, color: Colors.white, size: 18),
                     ),
                   ),
                   SizedBox(width: 12),
@@ -90,10 +78,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(33),
-                  border: Border.all(
-                    color: Colors.white.withAlpha(51),
-                    width: 1,
-                  ),
+                  border: Border.all(color: Colors.white.withAlpha(51), width: 1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
@@ -127,47 +112,26 @@ class _BalanceScreenState extends State<BalanceScreen> {
                               children: [
                                 Text(
                                   'Rp ${balance.total}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   'Total Earnings',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white.withAlpha(128),
-                                  ),
+                                  style: TextStyle(fontSize: 10, color: Colors.white.withAlpha(128)),
                                 ),
                               ],
                             ),
                           ),
-                          Container(
-                            width: 1,
-                            height: 40,
-                            color: Colors.white.withAlpha(38),
-                          ),
+                          Container(width: 1, height: 40, color: Colors.white.withAlpha(38)),
                           Expanded(
                             child: Column(
                               children: [
                                 Text(
                                   'Rp ${balance.withdrawn}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                                 ),
                                 SizedBox(height: 2),
-                                Text(
-                                  'Ditarik',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white.withAlpha(128),
-                                  ),
-                                ),
+                                Text('Ditarik', style: TextStyle(fontSize: 10, color: Colors.white.withAlpha(128))),
                               ],
                             ),
                           ),
@@ -192,24 +156,14 @@ class _BalanceScreenState extends State<BalanceScreen> {
         children: [
           Text(
             'Riwayat Penarikan',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textDark,
-            ),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textDark),
           ),
           SizedBox(height: 12),
           if (state.withdrawals.isEmpty)
             Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  'Belum ada penarikan',
-                  style: TextStyle(
-                    color: AppColors.textGray,
-                    fontSize: 13,
-                  ),
-                ),
+                child: Text('Belum ada penarikan', style: TextStyle(color: AppColors.textGray, fontSize: 13)),
               ),
             )
           else
@@ -223,8 +177,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
           PrimaryButton(
             label: 'Tarik Saldo',
             icon: Icons.account_balance_wallet,
-            onPressed: () =>
-                _showWithdrawalDialog(context, state.balance.balance),
+            onPressed: () => _showWithdrawalDialog(context, state.balance.balance),
           ),
         ],
       ),
@@ -246,23 +199,19 @@ class _WithdrawalItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = {
-      'pending': Color(0xFFF59E0B),
-      'approved': Color(0xFF10B981),
-      'rejected': Color(0xFFEF4444),
-    }[withdrawal.status.name] ?? Color(0xFFF59E0B);
+    final statusColor =
+        {
+          'Menunggu': Color(0xFFF59E0B),
+          'Disetujui': Color(0xFF10B981),
+          'Ditolak': Color(0xFFEF4444),
+        }[withdrawal.status.label] ??
+        Color(0xFFF59E0B);
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(15),
-            blurRadius: 6,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 6, offset: const Offset(0, 1))],
       ),
       child: Padding(
         padding: EdgeInsets.all(13),
@@ -271,14 +220,8 @@ class _WithdrawalItem extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: Icon(
-                Icons.arrow_downward,
-                color: AppColors.primary,
-              ),
+              decoration: BoxDecoration(color: Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(13)),
+              child: Icon(Icons.arrow_downward, color: AppColors.primary),
             ),
             SizedBox(width: 12),
             Expanded(
@@ -290,47 +233,33 @@ class _WithdrawalItem extends StatelessWidget {
                     children: [
                       Text(
                         'Penarikan Saldo',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: statusColor.withAlpha(102),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          withdrawal.status.label,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: statusColor,
-                          ),
-                        ),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textDark),
                       ),
                     ],
                   ),
                   SizedBox(height: 2),
                   Text(
                     '${withdrawal.createdAt.day} ${_getMonth(withdrawal.createdAt.month)} ${withdrawal.createdAt.year}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF9ab09a),
-                    ),
+                    style: TextStyle(fontSize: 11, color: Color(0xFF9ab09a)),
                   ),
                 ],
               ),
             ),
-            Text(
-              '−Rp ${withdrawal.amount}',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.error,
-              ),
+            Column(
+              children: [
+                Text(
+                  '−Rp ${withdrawal.amount}',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.error),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: statusColor.withAlpha(102), borderRadius: BorderRadius.circular(6)),
+                  child: Text(
+                    withdrawal.status.label,
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -339,20 +268,7 @@ class _WithdrawalItem extends StatelessWidget {
   }
 
   String _getMonth(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
   }
 }
@@ -389,10 +305,7 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Saldo tersedia: Rp ${widget.maxAmount}',
-            style: TextStyle(fontSize: 12, color: AppColors.textGray),
-          ),
+          Text('Saldo tersedia: Rp ${widget.maxAmount}', style: TextStyle(fontSize: 12, color: AppColors.textGray)),
           SizedBox(height: 16),
           TextField(
             controller: _amountController,
@@ -400,18 +313,13 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
             decoration: InputDecoration(
               hintText: 'Jumlah penarikan',
               errorText: _error,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Batal'),
-        ),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Batal')),
         TextButton(
           onPressed: () {
             final amount = int.tryParse(_amountController.text);
@@ -420,8 +328,7 @@ class _WithdrawalDialogState extends State<_WithdrawalDialog> {
               return;
             }
             if (amount > widget.maxAmount) {
-              setState(() => _error =
-                  'Jumlah melebihi saldo (Rp ${widget.maxAmount})');
+              setState(() => _error = 'Jumlah melebihi saldo (Rp ${widget.maxAmount})');
               return;
             }
             context.read<BalanceCubit>().requestWithdrawal(amount);
