@@ -74,36 +74,36 @@ class AdminBalanceCubit extends Cubit<AdminBalanceState> {
 
   Future<void> approveWithdrawal(AdminWithdrawal withdrawal) async {
     try {
+      // balance already deducted when user requested — just update status
       await _supabase
           .from('withdrawals')
           .update({'status': 'approved'})
           .eq('id', withdrawal.id);
-
-      // increment withdrawn in balances
-      final balanceData = await _supabase
-          .from('balances')
-          .select('withdrawn')
-          .eq('user_id', withdrawal.userId)
-          .single();
-
-      final current = (balanceData['withdrawn'] as num).toInt();
-      await _supabase
-          .from('balances')
-          .update({'withdrawn': current + withdrawal.amount})
-          .eq('user_id', withdrawal.userId);
-
       await loadWithdrawals();
     } catch (e) {
       emit(AdminBalanceFailure(e.toString()));
     }
   }
 
-  Future<void> rejectWithdrawal(String withdrawalId) async {
+  Future<void> rejectWithdrawal(AdminWithdrawal withdrawal) async {
     try {
       await _supabase
           .from('withdrawals')
           .update({'status': 'rejected'})
-          .eq('id', withdrawalId);
+          .eq('id', withdrawal.id);
+
+      // refund: decrement withdrawn
+      final balanceData = await _supabase
+          .from('balances')
+          .select('withdrawn')
+          .eq('user_id', withdrawal.userId)
+          .single();
+      final current = (balanceData['withdrawn'] as num).toInt();
+      await _supabase
+          .from('balances')
+          .update({'withdrawn': (current - withdrawal.amount).clamp(0, current)})
+          .eq('user_id', withdrawal.userId);
+
       await loadWithdrawals();
     } catch (e) {
       emit(AdminBalanceFailure(e.toString()));

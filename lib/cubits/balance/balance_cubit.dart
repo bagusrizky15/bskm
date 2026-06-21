@@ -92,6 +92,13 @@ class BalanceCubit extends Cubit<BalanceState> {
         'status': 'pending',
       });
 
+      // immediately deduct balance
+      final current = state.balance.withdrawn;
+      await Supabase.instance.client
+          .from('balances')
+          .update({'withdrawn': current + amount})
+          .eq('user_id', userId);
+
       emit(const WithdrawalSuccess());
       await fetchBalance();
     } catch (e) {

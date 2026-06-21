@@ -137,7 +137,7 @@ class AdminHomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Selamat pagi,',
+                        'Selamat datang,',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.white.withAlpha(153),

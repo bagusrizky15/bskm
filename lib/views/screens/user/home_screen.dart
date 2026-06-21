@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Selamat pagi,',
+                            'Selamat datang,',
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.white.withAlpha(166),

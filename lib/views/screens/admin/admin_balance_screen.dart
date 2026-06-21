@@ -440,7 +440,7 @@ class _WithdrawalDetailSheet extends StatelessWidget {
                     onPressed: () {
                       context
                           .read<AdminBalanceCubit>()
-                          .rejectWithdrawal(item.id);
+                          .rejectWithdrawal(item);
                       Navigator.pop(context);
                     },
                   ),
