@@ -64,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
-                          context.read<AuthCubit>().emit(const AuthInitial());
+                          context.read<AuthCubit>().resetState();
                           Navigator.pop(context);
                         },
                         borderRadius: BorderRadius.circular(13),
@@ -199,6 +199,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 hintText: 'Min. 8 karakter',
                 controller: _passwordController,
                 obscureText: true,
+                showPasswordToggle: true,
               ),
 
               SizedBox(height: 18),
@@ -224,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           TextButton(
                             onPressed: () {
                               Navigator.of(ctx).pop();
-                              context.read<AuthCubit>().emit(const AuthInitial());
+                              context.read<AuthCubit>().resetState();
                               Navigator.of(context).pushReplacementNamed('/login');
                             },
                             child: const Text('OK'),
@@ -264,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    context.read<AuthCubit>().emit(const AuthInitial());
+                    context.read<AuthCubit>().resetState();
                     Navigator.of(context).pop();
                   },
                   child: RichText(

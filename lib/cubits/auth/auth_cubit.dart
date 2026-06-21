@@ -15,6 +15,8 @@ class AuthCubit extends Cubit<AuthState> {
   bool get isLoggedIn => _currentUser != null;
   bool get isAdmin => _currentUser?.isAdmin ?? false;
 
+  void resetState() => emit(const AuthInitial());
+
   Future<void> checkSession() async {
     final session = _supabase.auth.currentSession;
     if (session == null) {

@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.of(context).pushReplacementNamed('/register'),
+                      onTap: () => Navigator.of(context).pushNamed('/register'),
                       child: Text(
                         'Daftar di sini',
                         style: TextStyle(
