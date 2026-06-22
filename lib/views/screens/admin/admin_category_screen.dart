@@ -278,12 +278,24 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Edit Harga – ${cat.name}'),
-        content: CustomTextField(
-          label: 'Harga per kg',
-          hintText: '',
-          controller: priceCtrl,
-          keyboardType: TextInputType.number,
+        title: Text('Edit Kategori'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomTextField(
+              label: 'Nama Kategori',
+              hintText: '',
+              controller: TextEditingController(text: cat.name),
+              enabled: false,
+            ),
+            const SizedBox(height: 14),
+            CustomTextField(
+              label: 'Harga per kg',
+              hintText: '',
+              controller: priceCtrl,
+              keyboardType: TextInputType.number,
+            ),
+          ],
         ),
         actions: [
           TextButton(
