@@ -6,7 +6,7 @@ import '../../../cubits/pickup/pickup_cubit.dart';
 import '../../../cubits/pickup/pickup_state.dart';
 
 class PickupListScreen extends StatefulWidget {
-  const PickupListScreen({Key? key}) : super(key: key);
+  const PickupListScreen({super.key});
 
   @override
   State<PickupListScreen> createState() => _PickupListScreenState();
@@ -258,7 +258,7 @@ class _PickupListScreenState extends State<PickupListScreen> {
 class PickupDetailSheet extends StatelessWidget {
   final dynamic pickup;
 
-  const PickupDetailSheet({Key? key, required this.pickup}) : super(key: key);
+  const PickupDetailSheet({super.key, required this.pickup});
 
   @override
   Widget build(BuildContext context) {
