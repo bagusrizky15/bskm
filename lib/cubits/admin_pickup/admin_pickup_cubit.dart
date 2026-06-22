@@ -41,7 +41,7 @@ class AdminPickupCubit extends Cubit<AdminPickupState> {
           id: p['id'].toString(),
           userId: p['user_id'],
           userName: userMap[p['user_id']] ?? 'Unknown',
-          category: _parseCategory(p['category']),
+          category: p['category'] ?? '',
           weight: (p['weight'] as num).toDouble(),
           estimatedPrice: (p['price'] as num).toInt(),
           pickupDate: DateTime.parse(p['pickup_date']),
@@ -115,17 +115,6 @@ class AdminPickupCubit extends Cubit<AdminPickupState> {
         ? _allPickups
         : _allPickups.where((p) => p.status == _selectedFilter).toList();
     emit(AdminPickupLoaded(pickups: filtered, selectedFilter: _selectedFilter));
-  }
-
-  WasteCategory _parseCategory(String? raw) {
-    const map = {
-      'Plastik': WasteCategory.plastic,
-      'Kertas': WasteCategory.paper,
-      'Logam': WasteCategory.metal,
-      'Kaca': WasteCategory.glass,
-      'Elektronik': WasteCategory.electronic,
-    };
-    return map[raw] ?? WasteCategory.plastic;
   }
 
   PickupStatus _parseStatus(String? raw) {

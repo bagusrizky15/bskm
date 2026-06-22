@@ -123,7 +123,7 @@ class _PickupScreenState extends State<PickupScreen> {
                   final catState = context.watch<AdminCategoryCubit>().state;
                   final categories = catState is AdminCategoryLoaded ? catState.categories : <CategoryModel>[];
 
-                  final byName = <String, CategoryModel>{for (final c in categories) c.name: c};
+                  final byName = <String, CategoryModel>{for (final c in categories.where((c) => !c.isArchived)) c.name: c};
                   final categoryNames = byName.keys.toList();
                   final categoryItems = categoryNames
                       .map((name) => DropdownMenuItem(value: name, child: Text(name)))

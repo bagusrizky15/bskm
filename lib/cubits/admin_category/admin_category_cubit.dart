@@ -22,6 +22,7 @@ class AdminCategoryCubit extends Cubit<AdminCategoryState> {
           id: (c['id'] as num).toInt(),
           name: c['category'] as String,
           pricePerKg: (c['price_per_kg'] as num).toInt(),
+          isArchived: c['is_archived'] as bool? ?? false,
         );
       }).toList();
 
@@ -43,11 +44,11 @@ class AdminCategoryCubit extends Cubit<AdminCategoryState> {
     }
   }
 
-  Future<void> updateCategory(int id, String name, int pricePerKg) async {
+  Future<void> updateCategory(int id, int pricePerKg) async {
     try {
       await _supabase
           .from('categories')
-          .update({'category': name, 'price_per_kg': pricePerKg})
+          .update({'price_per_kg': pricePerKg})
           .eq('id', id);
       await loadCategories();
     } catch (e) {
@@ -55,9 +56,12 @@ class AdminCategoryCubit extends Cubit<AdminCategoryState> {
     }
   }
 
-  Future<void> deleteCategory(int id) async {
+  Future<void> archiveCategory(int id, {required bool archive}) async {
     try {
-      await _supabase.from('categories').delete().eq('id', id);
+      await _supabase
+          .from('categories')
+          .update({'is_archived': archive})
+          .eq('id', id);
       await loadCategories();
     } catch (e) {
       emit(AdminCategoryFailure(e.toString()));

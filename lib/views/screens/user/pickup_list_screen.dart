@@ -278,7 +278,7 @@ class PickupDetailSheet extends StatelessWidget {
           ),
           SizedBox(height: 16),
           _buildDetailRow('Nama', pickup.userName),
-          _buildDetailRow('Kategori', pickup.category.name),
+          _buildDetailRow('Kategori', pickup.category),
           _buildDetailRow('Berat', '${pickup.weight} kg'),
           _buildDetailRow('Harga', 'Rp ${pickup.estimatedPrice}'),
           _buildDetailRow('Tanggal', _formatDate(pickup.pickupDate)),

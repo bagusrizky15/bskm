@@ -4,11 +4,13 @@ class CategoryModel {
   final int id;
   final String name;
   final int pricePerKg;
+  final bool isArchived;
 
   const CategoryModel({
     required this.id,
     required this.name,
     required this.pricePerKg,
+    this.isArchived = false,
   });
 }
 

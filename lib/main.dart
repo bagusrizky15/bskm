@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme.dart';
 import 'config/env.dart';
 import 'cubits/auth/auth_cubit.dart';
-import 'cubits/home/home_cubit.dart';
 import 'cubits/pickup/pickup_cubit.dart';
 import 'cubits/admin/admin_cubit.dart';
 import 'cubits/admin_pickup/admin_pickup_cubit.dart';
@@ -43,7 +42,6 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthCubit()),
-        BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(create: (_) => PickupCubit()),
         BlocProvider(create: (_) => AdminCubit()),
         BlocProvider(create: (_) => AdminPickupCubit()),

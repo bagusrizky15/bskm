@@ -7,7 +7,7 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
 class AdminCategoryScreen extends StatefulWidget {
-  const AdminCategoryScreen({Key? key}) : super(key: key);
+  const AdminCategoryScreen({super.key});
 
   @override
   State<AdminCategoryScreen> createState() => _AdminCategoryScreenState();
@@ -37,7 +37,14 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          BlocBuilder<AdminCategoryCubit, AdminCategoryState>(
+          BlocConsumer<AdminCategoryCubit, AdminCategoryState>(
+            listener: (context, state) {
+              if (state is AdminCategoryFailure) {
+                ScaffoldMessenger.of(context)
+                  ..clearSnackBars()
+                  ..showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
             builder: (context, state) {
               final categories =
                   state is AdminCategoryLoaded ? state.categories : <CategoryModel>[];
@@ -50,11 +57,6 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
                       const Padding(
                         padding: EdgeInsets.all(40),
                         child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (state is AdminCategoryFailure)
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Text('Error: ${state.message}'),
                       )
                     else
                       Padding(
@@ -78,9 +80,12 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
                                         category: cat,
                                         onEdit: () =>
                                             _showEditDialog(context, cat),
-                                        onDelete: () => context
+                                        onArchive: () => context
                                             .read<AdminCategoryCubit>()
-                                            .deleteCategory(cat.id),
+                                            .archiveCategory(
+                                              cat.id,
+                                              archive: !cat.isArchived,
+                                            ),
                                       ),
                                       const SizedBox(height: 10),
                                     ])
@@ -268,29 +273,17 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
   }
 
   void _showEditDialog(BuildContext context, CategoryModel cat) {
-    final nameCtrl = TextEditingController(text: cat.name);
     final priceCtrl = TextEditingController(text: cat.pricePerKg.toString());
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Kategori'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomTextField(
-              label: 'Nama',
-              hintText: '',
-              controller: nameCtrl,
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              label: 'Harga per kg',
-              hintText: '',
-              controller: priceCtrl,
-              keyboardType: TextInputType.number,
-            ),
-          ],
+        title: Text('Edit Harga – ${cat.name}'),
+        content: CustomTextField(
+          label: 'Harga per kg',
+          hintText: '',
+          controller: priceCtrl,
+          keyboardType: TextInputType.number,
         ),
         actions: [
           TextButton(
@@ -301,11 +294,9 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
             onPressed: () {
               final price = int.tryParse(priceCtrl.text.trim());
               if (price != null) {
-                context.read<AdminCategoryCubit>().updateCategory(
-                      cat.id,
-                      nameCtrl.text.trim(),
-                      price,
-                    );
+                context
+                    .read<AdminCategoryCubit>()
+                    .updateCategory(cat.id, price);
               }
               Navigator.pop(ctx);
             },
@@ -320,23 +311,24 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
 class _CategoryItem extends StatelessWidget {
   final CategoryModel category;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback onArchive;
 
   const _CategoryItem({
     required this.category,
     required this.onEdit,
-    required this.onDelete,
+    required this.onArchive,
   });
 
   @override
   Widget build(BuildContext context) {
+    final archived = category.isArchived;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: archived ? const Color(0xFFF5F5F5) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(18),
+            color: Colors.black.withAlpha(archived ? 8 : 18),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -350,23 +342,53 @@ class _CategoryItem extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
+                color: archived
+                    ? const Color(0xFFEEEEEE)
+                    : const Color(0xFFE8F5E9),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(Icons.category, color: AppColors.primary),
+              child: Icon(
+                Icons.category,
+                color: archived ? AppColors.textLight : AppColors.primary,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    category.name,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        category.name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: archived
+                              ? AppColors.textLight
+                              : AppColors.textDark,
+                        ),
+                      ),
+                      if (archived) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEEEEEE),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Diarsipkan',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textGray,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -380,18 +402,21 @@ class _CategoryItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            if (!archived)
+              _ActionBtn(
+                icon: Icons.edit,
+                color: AppColors.primary,
+                bg: AppColors.bgLight,
+                onTap: onEdit,
+              ),
+            if (!archived) const SizedBox(width: 8),
             _ActionBtn(
-              icon: Icons.edit,
-              color: AppColors.primary,
-              bg: AppColors.bgLight,
-              onTap: onEdit,
-            ),
-            const SizedBox(width: 8),
-            _ActionBtn(
-              icon: Icons.delete,
-              color: AppColors.error,
-              bg: const Color(0xFFFFF0F0),
-              onTap: onDelete,
+              icon: archived ? Icons.unarchive : Icons.archive,
+              color: archived ? AppColors.primary : AppColors.textGray,
+              bg: archived
+                  ? const Color(0xFFE8F5E9)
+                  : const Color(0xFFF5F5F5),
+              onTap: onArchive,
             ),
           ],
         ),
@@ -417,7 +442,8 @@ class _ActionBtn extends StatelessWidget {
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(10)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(

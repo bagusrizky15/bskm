@@ -60,10 +60,7 @@ class PickupCubit extends Cubit<PickupState> {
           id: item['id'].toString(),
           userId: item['user_id'],
           userName: item['name'],
-          category: WasteCategory.values.firstWhere(
-            (c) => c.name == item['category'],
-            orElse: () => WasteCategory.plastic,
-          ),
+          category: item['category'] ?? '',
           weight: item['weight'].toDouble(),
           estimatedPrice: item['price'],
           pickupDate: DateTime.parse(item['pickup_date']),

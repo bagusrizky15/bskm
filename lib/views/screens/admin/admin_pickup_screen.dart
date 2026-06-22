@@ -275,7 +275,7 @@ class _PickupItem extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '${pickup.weight} kg · ${pickup.category.name}',
+                            '${pickup.weight} kg · ${pickup.category}',
                             style: TextStyle(
                               fontSize: 11,
                               color: AppColors.textGray,
@@ -450,7 +450,7 @@ class _PickupDetailSheet extends StatelessWidget {
               children: [
                 _DetailRow(
                   label: 'Kategori',
-                  value: pickup.category.name,
+                  value: pickup.category,
                 ),
                 _DetailRow(
                   label: 'Berat',

@@ -15,7 +15,7 @@ class WastePickup {
   final String id;
   final String userId;
   final String userName;
-  final WasteCategory category;
+  final String category;
   final double weight;
   final int estimatedPrice;
   final DateTime pickupDate;
