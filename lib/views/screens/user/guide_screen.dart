@@ -19,6 +19,7 @@ class _GuideScreenState extends State<GuideScreen> {
     _categoriesFuture = Supabase.instance.client
         .from('categories')
         .select()
+        .eq('is_archived', false)
         .order('category', ascending: true);
   }
 

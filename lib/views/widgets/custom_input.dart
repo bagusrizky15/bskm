@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final bool showPasswordToggle;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
+  final bool enabled;
 
   const CustomTextField({
     Key? key,
@@ -21,6 +22,7 @@ class CustomTextField extends StatefulWidget {
     this.showPasswordToggle = false,
     this.onChanged,
     this.validator,
+    this.enabled = true,
   }) : super(key: key);
 
   @override
@@ -54,7 +56,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Container(
           height: 52,
           decoration: BoxDecoration(
-            color: AppColors.bgSecondary,
+            color: widget.enabled ? AppColors.bgSecondary : const Color(0xFFF0F0F0),
             border: Border.all(
               color: AppColors.border,
               width: 1.5,
@@ -66,6 +68,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             keyboardType: widget.keyboardType,
             obscureText: _obscureText,
             onChanged: widget.onChanged,
+            enabled: widget.enabled,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding:

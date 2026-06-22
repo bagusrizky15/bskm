@@ -19,9 +19,9 @@ class AdminHomeScreen extends StatelessWidget {
           final totalWaste = state is AdminLoaded ? state.totalWaste : 0;
 
           return SingleChildScrollView(
-            child: Column(
+              child: Column(
               children: [
-                _buildHeader(context, totalUsers, totalWaste),
+                _buildHeader(context, totalUsers, totalWaste, isLoading: state is AdminLoading),
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -89,7 +89,7 @@ class AdminHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, int totalUsers, int totalWaste) {
+  Widget _buildHeader(BuildContext context, int totalUsers, int totalWaste, {required bool isLoading}) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -154,6 +154,26 @@ class AdminHomeScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  GestureDetector(
+                    onTap: isLoading ? null : () => context.read<AdminCubit>().loadStats(),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(38),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: isLoading
+                          ? Padding(
+                              padding: EdgeInsets.all(8),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Icon(Icons.refresh, color: Colors.white, size: 20),
+                    ),
                   ),
                 ],
               ),
