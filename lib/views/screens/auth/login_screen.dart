@@ -34,7 +34,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: BlocBuilder<AuthCubit, AuthState>(
+        buildWhen: (p, c) => c is AuthLoading || c is AuthFailure || c is AuthSuccess || c is AuthInitial,
+        builder: (context, state) {
+          final loading = state is AuthLoading;
+          return Stack(
+            children: [
+              AbsorbPointer(
+                absorbing: loading,
+                child: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 32, vertical: 20),
           child: Column(
@@ -170,6 +178,15 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
+      ),
+              ),
+              if (loading)
+                const Positioned.fill(
+                  child: ColoredBox(color: Color(0x33000000)),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
