@@ -12,8 +12,11 @@ class AdminPickupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: () => context.read<AdminPickupCubit>().loadPickups(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
           children: [
             _buildHeader(context),
             BlocBuilder<AdminPickupCubit, AdminPickupState>(
@@ -41,6 +44,7 @@ class AdminPickupScreen extends StatelessWidget {
               },
             ),
           ],
+        ),
         ),
       ),
     );

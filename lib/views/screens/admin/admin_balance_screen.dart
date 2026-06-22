@@ -13,7 +13,11 @@ class AdminBalanceScreen extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<AdminBalanceCubit, AdminBalanceState>(
         builder: (context, state) {
-          return SingleChildScrollView(
+          return RefreshIndicator(
+            onRefresh: () =>
+                context.read<AdminBalanceCubit>().loadWithdrawals(),
+            child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
                 _buildHeader(context, state),
@@ -38,6 +42,7 @@ class AdminBalanceScreen extends StatelessWidget {
                     ),
                   ),
               ],
+            ),
             ),
           );
         },
