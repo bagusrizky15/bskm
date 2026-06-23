@@ -73,11 +73,22 @@ class Env {
 
 ### 4. Set Up the Database
 
-Run the SQL migrations in your Supabase project:
+You need to run the SQL commands to set up your database tables and policies.
 
-1. Go to your Supabase Dashboard
-2. Navigate to **SQL Editor**
-3. Execute the SQL files located in the `supabase/migrations/` and `supabase/sql/` directories in order
+**Important:** Follow the instructions in the [`SUPABASE.md`](SUPABASE.md) file to set up your database.
+
+1. Go to your [Supabase Dashboard](https://app.supabase.com/)
+2. Select your project
+3. Navigate to **SQL Editor**
+4. Open the `SUPABASE.md` file in this repository
+5. Execute each SQL block in the order listed:
+   - Block 1: Users table + auto-profile on signup
+   - Block 2: Categories + Pickups
+   - Block 3: Balances + Withdrawals
+   - Block 4: Bank Accounts
+6. (Optional) Run the admin user setup command if you need to make a user an admin
+
+**Note:** All SQL blocks are idempotent (safe to re-run). If you encounter any errors, you can safely re-execute the blocks.
 
 ### 5. Run the Application
 

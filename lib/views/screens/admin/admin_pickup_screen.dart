@@ -469,33 +469,35 @@ class _PickupDetailSheet extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: SecondaryButton(
-                  label: 'Tolak',
-                  borderColor: Color(0xFFffcdd2),
-                  textColor: AppColors.error,
-                  onPressed: () {
-                    context.read<AdminPickupCubit>().rejectPickup(pickup.id);
-                    Navigator.pop(context);
-                  },
+          if (pickup.status == PickupStatus.waiting) ...[
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: SecondaryButton(
+                    label: 'Tolak',
+                    borderColor: Color(0xFFffcdd2),
+                    textColor: AppColors.error,
+                    onPressed: () {
+                      context.read<AdminPickupCubit>().rejectPickup(pickup.id);
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: PrimaryButton(
-                  label: 'Konfirmasi',
-                  onPressed: () {
-                    context.read<AdminPickupCubit>().confirmPickup(pickup);
-                    Navigator.pop(context);
-                  },
+                SizedBox(width: 10),
+                Expanded(
+                  flex: 2,
+                  child: PrimaryButton(
+                    label: 'Konfirmasi',
+                    onPressed: () {
+                      context.read<AdminPickupCubit>().confirmPickup(pickup);
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
