@@ -464,8 +464,18 @@ class _PickupDetailSheet extends StatelessWidget {
                 _DetailRow(
                   label: 'Tanggal',
                   value: '${pickup.pickupDate.day} Jun 2026',
-                  isLast: true,
                 ),
+                _DetailRow(
+                  label: 'Alamat',
+                  value: pickup.address,
+                  isLast: pickup.notes == null || pickup.notes!.isEmpty,
+                ),
+                if (pickup.notes != null && pickup.notes!.isNotEmpty)
+                  _DetailRow(
+                    label: 'Catatan',
+                    value: pickup.notes!,
+                    isLast: true,
+                  ),
               ],
             ),
           ),

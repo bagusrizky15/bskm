@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
   final bool enabled;
+  final String? errorText;
 
   const CustomTextField({
     Key? key,
@@ -23,6 +24,7 @@ class CustomTextField extends StatefulWidget {
     this.onChanged,
     this.validator,
     this.enabled = true,
+    this.errorText,
   }) : super(key: key);
 
   @override
@@ -58,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: BoxDecoration(
             color: widget.enabled ? AppColors.bgSecondary : const Color(0xFFF0F0F0),
             border: Border.all(
-              color: AppColors.border,
+              color: widget.errorText != null ? Colors.red : AppColors.border,
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(14),
@@ -99,6 +101,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
         ),
+        if (widget.errorText != null) ...[
+          SizedBox(height: 5),
+          Text(
+            widget.errorText!,
+            style: TextStyle(fontSize: 11, color: Colors.red),
+          ),
+        ],
       ],
     );
   }

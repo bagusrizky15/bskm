@@ -19,6 +19,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _passwordController;
   bool _agreeToTerms = true;
+  String? _nameError;
+  String? _emailError;
+  String? _phoneError;
+  String? _passwordError;
 
   @override
   void initState() {
@@ -109,6 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 label: 'Nama Lengkap',
                 hintText: 'Contoh: Budi Santoso',
                 controller: _nameController,
+                errorText: _nameError,
               ),
 
               SizedBox(height: 12),
@@ -119,6 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 hintText: 'nama@email.com',
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
+                errorText: _emailError,
               ),
 
               SizedBox(height: 12),
@@ -142,7 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.bgSecondary,
                       border: Border.all(
-                        color: AppColors.border,
+                        color: _phoneError != null
+                            ? Colors.red
+                            : AppColors.border,
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(13),
@@ -188,6 +196,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                   ),
+                  if (_phoneError != null) ...[
+                    SizedBox(height: 5),
+                    Text(
+                      _phoneError!,
+                      style: TextStyle(fontSize: 11, color: Colors.red),
+                    ),
+                  ],
                 ],
               ),
 
@@ -200,6 +215,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _passwordController,
                 obscureText: true,
                 showPasswordToggle: true,
+                errorText: _passwordError,
               ),
 
               SizedBox(height: 18),
@@ -248,6 +264,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     label: 'Daftar Sekarang',
                     isLoading: state is AuthLoading,
                     onPressed: () {
+                      setState(() {
+                        _nameError = _nameController.text.trim().isEmpty
+                            ? 'Nama lengkap tidak boleh kosong'
+                            : null;
+                        final email = _emailController.text.trim();
+                        _emailError = email.isEmpty
+                            ? 'Email tidak boleh kosong'
+                            : !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                                    .hasMatch(email)
+                                ? 'Format email tidak valid'
+                                : null;
+                        _phoneError = _phoneController.text.trim().isEmpty
+                            ? 'No. telepon tidak boleh kosong'
+                            : null;
+                        _passwordError = _passwordController.text.isEmpty
+                            ? 'Kata sandi tidak boleh kosong'
+                            : null;
+                      });
+                      if (_nameError != null ||
+                          _emailError != null ||
+                          _phoneError != null ||
+                          _passwordError != null) {
+                        return;
+                      }
                       context.read<AuthCubit>().register(
                         _nameController.text,
                         _emailController.text,

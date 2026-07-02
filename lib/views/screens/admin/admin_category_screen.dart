@@ -250,14 +250,28 @@ class _AdminCategoryScreenState extends State<AdminCategoryScreen> {
                             final name = _nameController.text.trim();
                             final price =
                                 int.tryParse(_priceController.text.trim());
-                            if (name.isNotEmpty && price != null) {
-                              context
-                                  .read<AdminCategoryCubit>()
-                                  .addCategory(name, price);
-                              setState(() => _showAddForm = false);
-                              _nameController.clear();
-                              _priceController.clear();
+                            if (name.isEmpty) {
+                              ScaffoldMessenger.of(context)
+                                ..clearSnackBars()
+                                ..showSnackBar(const SnackBar(
+                                    content:
+                                        Text('Nama kategori tidak boleh kosong')));
+                              return;
                             }
+                            if (price == null) {
+                              ScaffoldMessenger.of(context)
+                                ..clearSnackBars()
+                                ..showSnackBar(const SnackBar(
+                                    content:
+                                        Text('Harga kategori tidak boleh kosong')));
+                              return;
+                            }
+                            context
+                                .read<AdminCategoryCubit>()
+                                .addCategory(name, price);
+                            setState(() => _showAddForm = false);
+                            _nameController.clear();
+                            _priceController.clear();
                           },
                         ),
                       ),
