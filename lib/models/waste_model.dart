@@ -15,6 +15,7 @@ class WastePickup {
   final String id;
   final String userId;
   final String userName;
+  final String inputName;
   final String category;
   final double weight;
   final int estimatedPrice;
@@ -27,6 +28,7 @@ class WastePickup {
     required this.id,
     required this.userId,
     required this.userName,
+    this.inputName = '',
     required this.category,
     required this.weight,
     required this.estimatedPrice,

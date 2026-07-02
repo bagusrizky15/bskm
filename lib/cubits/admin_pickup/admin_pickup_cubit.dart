@@ -41,6 +41,7 @@ class AdminPickupCubit extends Cubit<AdminPickupState> {
           id: p['id'].toString(),
           userId: p['user_id'],
           userName: userMap[p['user_id']] ?? 'Unknown',
+          inputName: p['name'] ?? '',
           category: p['category'] ?? '',
           weight: (p['weight'] as num).toDouble(),
           estimatedPrice: (p['price'] as num).toInt(),

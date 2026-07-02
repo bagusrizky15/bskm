@@ -271,6 +271,15 @@ class _PickupItem extends StatelessWidget {
                           color: AppColors.textDark,
                         ),
                       ),
+                      if (pickup.inputName.isNotEmpty &&
+                          pickup.inputName != pickup.userName)
+                        Text(
+                          'Input: ${pickup.inputName}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textGray,
+                          ),
+                        ),
                       SizedBox(height: 4),
                       Row(
                         children: [
@@ -448,6 +457,12 @@ class _PickupDetailSheet extends StatelessWidget {
             ),
             child: Column(
               children: [
+                if (pickup.inputName.isNotEmpty &&
+                    pickup.inputName != pickup.userName)
+                  _DetailRow(
+                    label: 'Nama Input',
+                    value: pickup.inputName,
+                  ),
                 _DetailRow(
                   label: 'Kategori',
                   value: pickup.category,
@@ -534,6 +549,7 @@ class _DetailRow extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 11),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -543,12 +559,18 @@ class _DetailRow extends StatelessWidget {
                   color: AppColors.textGray,
                 ),
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: valueColor ?? AppColors.textDark,
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.end,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: valueColor ?? AppColors.textDark,
+                  ),
                 ),
               ),
             ],

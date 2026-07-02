@@ -280,7 +280,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             : null;
                         _passwordError = _passwordController.text.isEmpty
                             ? 'Kata sandi tidak boleh kosong'
-                            : null;
+                            : _passwordController.text.length < 8
+                                ? 'Kata sandi minimal 8 karakter'
+                                : null;
                       });
                       if (_nameError != null ||
                           _emailError != null ||
