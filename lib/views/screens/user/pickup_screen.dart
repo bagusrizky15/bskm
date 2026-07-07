@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/colors.dart';
+import '../../../cubits/auth/auth_cubit.dart';
 import '../../../cubits/pickup/pickup_cubit.dart';
 import '../../../cubits/pickup/pickup_state.dart';
 import '../../../cubits/admin_category/admin_category_cubit.dart';
@@ -16,7 +17,6 @@ class PickupScreen extends StatefulWidget {
 }
 
 class _PickupScreenState extends State<PickupScreen> {
-  late TextEditingController _nameController;
   late TextEditingController _addressController;
   late TextEditingController _notesController;
   String? _selectedCategory;
@@ -26,7 +26,6 @@ class _PickupScreenState extends State<PickupScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
     _addressController = TextEditingController();
     _notesController = TextEditingController();
     _selectedDate = DateTime.now().add(const Duration(days: 1));
@@ -34,7 +33,6 @@ class _PickupScreenState extends State<PickupScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _addressController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -138,8 +136,6 @@ class _PickupScreenState extends State<PickupScreen> {
 
                   return Column(
                     children: [
-                      CustomTextField(label: 'Nama', hintText: 'Masukkan nama lengkap', controller: _nameController),
-                      SizedBox(height: 13),
                       if (categoryItems.isEmpty)
                         const Center(child: CircularProgressIndicator())
                       else
@@ -374,7 +370,7 @@ class _PickupScreenState extends State<PickupScreen> {
                             return;
                           }
                           context.read<PickupCubit>().submitPickup(
-                            name: _nameController.text.trim(),
+                            name: context.read<AuthCubit>().currentUser?.name ?? '',
                             category: validCategory!,
                             weight: _weight,
                             price: estimatedPrice,
@@ -396,7 +392,6 @@ class _PickupScreenState extends State<PickupScreen> {
   }
 
   String? _validate(String? category) {
-    if (_nameController.text.trim().isEmpty) return 'Nama wajib diisi';
     if (category == null) return 'Pilih kategori dulu';
     if (_weight <= 0) return 'Berat harus lebih dari 0';
     if (_addressController.text.trim().isEmpty) return 'Alamat wajib diisi';

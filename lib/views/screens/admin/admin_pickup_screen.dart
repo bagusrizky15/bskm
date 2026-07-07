@@ -417,12 +417,10 @@ class _PickupDetailSheet extends StatelessWidget {
             ),
             child: Column(
               children: [
-                if (pickup.inputName.isNotEmpty &&
-                    pickup.inputName != pickup.userName)
-                  _DetailRow(
-                    label: 'Nama Input',
-                    value: pickup.inputName,
-                  ),
+                _DetailRow(
+                  label: 'Nama Akun',
+                  value: pickup.userName,
+                ),
                 _DetailRow(
                   label: 'Kategori',
                   value: pickup.category,
