@@ -390,7 +390,38 @@ class _PickupDetailSheet extends StatelessWidget {
           SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: SizedBox()),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(Icons.person, color: AppColors.primary),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pickup.userName,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    Text(
+                      'Pengguna terdaftar',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textGray,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
                 padding: EdgeInsets.symmetric(
                     horizontal: 12, vertical: 4),
@@ -417,10 +448,6 @@ class _PickupDetailSheet extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _DetailRow(
-                  label: 'Nama Akun',
-                  value: pickup.userName,
-                ),
                 _DetailRow(
                   label: 'Kategori',
                   value: pickup.category,
