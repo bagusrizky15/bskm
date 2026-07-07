@@ -217,6 +217,7 @@ class _PickupListScreenState extends State<PickupListScreen> {
           }
         },
         backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         icon: Icon(Icons.add),
         label: Text('Ajukan Penjemputan'),
       ),

@@ -4,7 +4,6 @@ import '../../../config/colors.dart';
 import '../../../cubits/balance/balance_cubit.dart';
 import '../../../cubits/balance/balance_state.dart';
 import '../../../models/balance_model.dart';
-import '../../widgets/custom_button.dart';
 
 class BalanceScreen extends StatefulWidget {
   const BalanceScreen({super.key});
@@ -34,6 +33,18 @@ class _BalanceScreenState extends State<BalanceScreen> {
             return Center(child: Text('Error: ${state.message}'));
           }
           return const Center(child: CircularProgressIndicator());
+        },
+      ),
+      floatingActionButton: BlocBuilder<BalanceCubit, BalanceState>(
+        builder: (context, state) {
+          if (state is! BalanceLoaded) return SizedBox();
+          return FloatingActionButton.extended(
+            onPressed: () => _showWithdrawalDialog(context, state.balance.balance),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            icon: Icon(Icons.account_balance_wallet),
+            label: Text('Tarik Saldo'),
+          );
         },
       ),
     );
@@ -179,12 +190,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
                 .expand((item) => [item, SizedBox(height: 9)])
                 .toList()
                 .dropLast(1),
-          SizedBox(height: 20),
-          PrimaryButton(
-            label: 'Tarik Saldo',
-            icon: Icons.account_balance_wallet,
-            onPressed: () => _showWithdrawalDialog(context, state.balance.balance),
-          ),
+          SizedBox(height: 80),
         ],
       ),
     );

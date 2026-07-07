@@ -4,10 +4,9 @@ import '../../../config/colors.dart';
 import '../../../cubits/auth/auth_cubit.dart';
 import '../../../cubits/auth/auth_state.dart';
 import '../../widgets/custom_button.dart';
-import '../../widgets/app_icons.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,20 +32,27 @@ class HomeScreen extends StatelessWidget {
               children: [
                 // Green header
                 Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(0.5, -0.3),
-                  end: Alignment(1, 1),
-                  colors: [Color(0xFF145214), AppColors.primary],
-                ),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment(0.5, -0.3),
+                      end: Alignment(1, 1),
+                      colors: [Color(0xFF145214), AppColors.primary],
+                    ),
+                  ),
+                  child: SafeArea(
+                    bottom: false,
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(36),
+                        border: Border.all(
+                          color: Colors.white.withAlpha(51),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -70,93 +76,8 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 18),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(36),
-                          border: Border.all(
-                            color: Colors.white.withAlpha(51),
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          backgroundBlendMode: BlendMode.overlay,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: BackdropFilter(
-                            filter: ColorFilter.mode(
-                              Colors.transparent,
-                              BlendMode.overlay,
-                            ),
-                        child: InkWell(
-                          onTap: () => context.read<AuthCubit>().updateLocation(),
-                          borderRadius: BorderRadius.circular(18),
-                          child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withAlpha(46),
-                                    borderRadius:
-                                        BorderRadius.circular(13),
-                                  ),
-                                  child: Center(
-                                    child: AppIcons.locationIcon(),
-                                  ),
-                                ),
-                                SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Lokasi Anda',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.white
-                                              .withAlpha(166),
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.1,
-                                          textBaseline:
-                                              TextBaseline.alphabetic,
-                                        ),
-                                      ),
-                                      Text(
-                                        authState is AuthSuccess
-                                            ? authState.user.location
-                                            : '',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(Icons.my_location,
-                                    color: Colors.white.withAlpha(153),
-                                    size: 16),
-                              ],
-                            ),
-                          ),
-                        ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                  ],
+                  ),
                 ),
-              ),
-            ),
 
             // Main menu
             Padding(
