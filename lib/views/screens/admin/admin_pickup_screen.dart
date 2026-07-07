@@ -264,22 +264,13 @@ class _PickupItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        pickup.userName,
+                        pickup.inputName,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textDark,
                         ),
                       ),
-                      if (pickup.inputName.isNotEmpty &&
-                          pickup.inputName != pickup.userName)
-                        Text(
-                          'Input: ${pickup.inputName}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textGray,
-                          ),
-                        ),
                       SizedBox(height: 4),
                       Row(
                         children: [
@@ -399,38 +390,7 @@ class _PickupDetailSheet extends StatelessWidget {
           SizedBox(height: 16),
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.person, color: AppColors.primary),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      pickup.userName,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    Text(
-                      'Pengguna terdaftar',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textGray,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              Expanded(child: SizedBox()),
               Container(
                 padding: EdgeInsets.symmetric(
                     horizontal: 12, vertical: 4),
@@ -585,11 +545,5 @@ class _DetailRow extends StatelessWidget {
           ),
       ],
     );
-  }
-}
-
-extension on List {
-  List dropLast(int count) {
-    return sublist(0, (length - count).clamp(0, length));
   }
 }
